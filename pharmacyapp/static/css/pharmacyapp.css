@@ -1,0 +1,328 @@
+body {
+    padding-top: 70px; /* Space for fixed navbar */
+    background: url('../images/hospital3.jpg') no-repeat center center fixed;
+    background-size: cover; /* Makes background image cover the entire viewport */
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
+/* Navbar Styles */
+.navbar {
+    margin-bottom: 0; /* Remove bottom margin to avoid space below navbar */
+}
+
+/* Ensure navbar items align correctly */
+.navbar-nav {
+    list-style: none;
+    padding-left: 0;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start; /* Align items to the left */
+    gap: 20px; /* Space between menu items */
+    flex-wrap: wrap; /* Allow items to wrap onto the next line */
+}
+
+/* Align the nav items as inline-blocks */
+.navbar-nav li {
+    display: inline-block;
+}
+
+/* Remove underlines from nav links and make them bold */
+.navbar-nav .nav-link {
+    text-decoration: none;
+    font-weight: bold;
+}
+
+/* Navbar collapse styles */
+.navbar-collapse {
+    display: flex;
+    flex-wrap: wrap; /* Allow navbar items to wrap to the next line */
+    justify-content: space-between; /* Align items across available space */
+}
+
+/* Ensure dropdown menus are properly aligned */
+.dropdown-menu {
+    min-width: 200px;
+}
+
+/* Custom grey background for navbar */
+.navbar-grey {
+    background-color: #F0F0F0; /* Grey background color */
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000; /* Ensure navbar is on top */
+}
+
+/* Add padding to the body to account for the fixed navbar */
+.content {
+    padding-top: 70px; /* Adjust this value depending on your navbar height */
+}
+
+/* Adjustments for larger screens */
+@media (min-width: 768px) {
+    .navbar-nav {
+        gap: 30px; /* Larger gap for bigger screens */
+    }
+}
+
+/* Adjustments for smaller screens */
+@media (max-width: 768px) {
+    body {
+        padding-top: 60px; /* Adjust for mobile navbar */
+    }
+
+    .navbar-toggler {
+        margin-top: 5px;
+    }
+
+    .navbar-nav {
+        margin-top: 10px;
+    }
+
+    .navbar-nav .nav-item {
+        padding: 8px 0;
+    }
+
+    .navbar-nav .nav-link {
+        font-size: 14px;
+    }
+}
+
+/* Adjustments for very small screens (max-width: 420px) */
+@media (max-width: 420px) {
+    /* Reduce the spacing between navbar items to fit them on smaller screens */
+    .navbar-nav {
+        gap: 10px;
+        width: 100%; /* Ensure navbar takes full width */
+        justify-content: space-between; /* Space out items */
+    }
+
+    /* Ensure the user info and logout buttons go to a new row */
+    .navbar-nav.ml-auto {
+        margin-left: 0; /* Remove margin-left to make space for wrapping */
+        width: 100%; /* Full width so items can stack */
+        justify-content: flex-start; /* Align to the left */
+    }
+
+    .navbar-nav .nav-item {
+        padding: 8px 0;
+    }
+
+    .navbar-nav .nav-link {
+        font-size: 14px;
+    }
+
+    /* Stack menu items into rows when screen is smaller */
+    .navbar-nav li {
+        display: block; /* Force each item to be block-level so it stacks vertically */
+        width: 100%; /* Make each item take full width */
+    }
+
+    /* Adjust the toggler button */
+    .navbar-toggler {
+        margin-top: 5px;
+    }
+}
+
+/* Ensure no table styles are being overridden */
+table {
+    width: 100%; /* Ensure table uses full available width */
+    border-collapse: collapse; /* Remove spacing between table cells */
+    caption-side: top; /* Set caption to appear at the top of the table */
+    text-align: center; 
+}
+
+table thead {
+    background-color: #007bff; /* Set background color (blue in this example) */
+    color: #fff; /* Set text color to white */
+    font-weight: bold; /* Make the text bold */
+    text-align: center; /* Center the header text */
+}
+
+/* Top and bottom borders only for table */
+table.table-bordered th, table.table-bordered td {
+    border-left: none; /* Remove left border */
+    border-right: none; /* Remove right border */
+    border-top: 2px solid #dee2e6; /* Top border */
+    border-bottom: 2px solid #dee2e6; /* Bottom border */
+}
+
+/* Alternate row colors for banding */
+.even-row {
+    background-color: #f2f2f2; /* Light gray for even rows */
+}
+
+.odd-row {
+    background-color: #ffffff; /* White for odd rows */
+}
+
+/* Apply general styles for the buttons and icons */
+table .btn-danger {
+    border: none;
+    background: transparent;
+    color: red;
+    padding: 0;
+}
+
+table .btn-danger:hover {
+    color: darkred;
+}
+
+/* Ensure the sort icon appears correctly */
+table .sort-icon {
+    font-size: 12px; /* Adjust the size of the sort icon */
+    display: inline-block;
+    margin-left: 5px;
+}
+
+/* Global font and link styling for table */
+a.btn {
+    text-decoration: none; /* Remove underlines from links in the table */
+    color: #007bff; /* Bootstrap blue for links */
+}
+
+
+/* Adjustments for any other potential conflicts with global styles */
+body {
+    font-family: 'Arial', sans-serif; /* Ensure the font is consistent */
+    background-color: #f8f9fa; /* Background for body */
+}
+
+/* Custom styles for the button encapsulated in a grey box */
+button.save.btn.btn-default {
+    background-color: #6c757d;  /* Grey background */
+    color: white;               /* White text */
+    border: 1px solid #6c757d;  /* Grey border matching the background */
+    padding: 10px 20px;         /* Padding around the text */
+    border-radius: 5px;         /* Rounded corners for the button */
+    font-size: 16px;            /* Adjust the font size */
+    text-align: center;         /* Center the text */
+    cursor: pointer;           /* Change cursor to pointer */
+    display: inline-block;      /* Ensure it behaves like an inline element */
+    box-sizing: border-box;     /* Include padding in the total width/height */
+    transition: background-color 0.3s, border-color 0.3s; /* Smooth transition for hover effect */
+}
+
+/* Hover effect for the button */
+button.save.btn.btn-default:hover {
+    background-color: #5a6268;  /* Darker grey on hover */
+    border-color: #545b62;      /* Darker border on hover */
+}
+
+/* Focus effect (when the button is focused, for accessibility) */
+button.save.btn.btn-default:focus {
+    outline: none;              /* Remove the default outline */
+    box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5); /* Soft blue glow around the button */
+}
+
+/* Active effect (when the button is clicked) */
+button.save.btn.btn-default:active {
+    background-color: #545b62;  /* Even darker grey when pressed */
+    border-color: #4e555b;      /* Darker border when pressed */
+}
+
+
+.shopNameRight{
+    font-family: 'verdana';
+    font-style: italic;
+    text-align:right;
+    font-size:8px;
+    border-style:none none solid none;
+}
+.shopNameLeft{
+    font-size:16px;
+    text-align:left;
+    border-style:none none solid none;
+}
+
+.patDetLeft{
+    font-family: 'verdana';
+    font-style: italic;
+    color:black;
+    text-align:left;
+    font-size:12px;
+    border-style:none none none none;
+    background-color:rgba(0,0,255,0);
+}
+.patDetRight{
+    font-size:12px;
+    text-align:right;
+    color:black;    
+    border-style:none none none none;
+    background-color:rgba(0,0,255,0);
+}
+
+.footNote {
+    font-size:11px;
+}
+.rightAlign {
+    font-size:12px;
+    text-align:right;
+}
+
+@media print {
+    .hidden-print {
+      display: none;
+    }
+    @page {
+      size: 105mm 148.5mm; /* Quarter of A4 */
+      margin-left: 0.5cm;  /* Adjusted left margin */
+      margin-bottom: 0.5cm; /* Adjusted bottom margin */
+      margin-top: 0.5cm;  /* Adjusted top margin */
+    }
+
+    table, td, th {
+        border: 1px solid black;
+        font-size: 7pt;
+        background-color: white;
+        color: black;
+    }
+    tr.last,tr.first {
+        border-style:solid none solid none;
+    }
+    h1 {
+        font-size:10pt;
+        color: black;
+        line-height: 2px;
+    }
+    h6.addressClass {
+        font-size:6pt;
+        color: black;
+        line-height: 2px;
+    }
+    .header {
+        display: none;
+    }
+    #shopHead{
+        border-style:none none solid none;
+    }
+    .shopNameRight{
+        text-align:right;
+        font-size:7pt;
+    }
+    .shopNameLeft{
+        font-family: 'verdana';
+        font-style: italic;
+        font-size:12pt;
+        text-align:left;
+    }
+    .navbar-fixed-top {
+        margin-bottom:0px;
+    }
+    body {
+        padding-top:0px;
+        font-size: 7pt;
+    }
+    .rightAlign {
+        font-size: 8pt; /* Smaller font size for the right aligned text */
+        text-align: right;
+    }
+    .footNote {
+        font-size: 6pt; /* Smaller font size for footnote */
+    }
+}

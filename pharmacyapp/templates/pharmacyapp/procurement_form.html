@@ -1,0 +1,66 @@
+{% extends 'pharmacyapp/base.html' %}
+
+{% block body_block %}
+    {% if messages %}
+    <h2 class="messages">
+        {% for message in messages %}
+        <a{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</a>
+        {% endfor %}
+    </h2>
+    {% endif %}
+
+    <h1>Product Stock Entry</h1>
+	<form method="POST" enctype="multipart/form-data">
+	    {% csrf_token %}
+
+	    <label for="medicineName">Medicine Name:</label>
+	    <input type="text" id="medicineName" name="medicineName" required
+	           value="{% if request.POST.medicineName %}{{ request.POST.medicineName }}{% endif %}"><br><br>
+
+	    <label for="medCategory">Category:</label>
+	    <select id="medCategory" name="medCategory" required>
+	        <option value="" disabled {% if not request.POST.medCategory %}selected{% endif %}>Select Category</option>
+	        {% for category in categories %}
+	            <option value="{{ category.id }}"
+	                    {% if request.POST.medCategory == category.id %}selected{% endif %}>
+	                {{ category.name }}
+	            </option>
+	        {% endfor %}
+	    </select><br><br>
+
+	    <label for="batchNo">Batch Number:</label>
+	    <input type="text" id="batchNo" name="batchNo" required
+	           value="{% if request.POST.batchNo %}{{ request.POST.batchNo }}{% endif %}"><br><br>
+
+	    <label for="pack">No. of Tablets per Strip/Bottle:</label>
+	    <input type="number" id="pack" name="pack" step="1" min="1" required
+	           value="{% if request.POST.pack %}{{ request.POST.pack }}{% elif pack_size %}{{ pack_size }}{% else %}{% endif %}"><br><br>
+
+	    <label for="quantity">Number of Strips/Pieces Purchased:</label>
+	    <input type="number" id="quantity" name="quantity" step="1" min="1" required
+	           value="{% if request.POST.quantity %}{{ request.POST.quantity }}{% else %}{% endif %}"><br><br>
+
+	    <label for="pricePerStrip">Price per Strip/Piece:</label>
+	    <input type="number" id="pricePerStrip" name="pricePerStrip" step="0.01" min="0.01" required
+	           value="{% if request.POST.pricePerStrip %}{{ request.POST.pricePerStrip }}{% else %}{% endif %}"><br><br>
+
+	    <label for="mrp">M.R.P. per Strip:</label>
+	    <input type="number" id="mrp" name="mrp" step="0.01" min="0.01" required
+	           value="{% if request.POST.mrp %}{{ request.POST.mrp }}{% else %}{% endif %}"><br><br>
+
+	    <label for="dateOfPurchase">Date of Purchase:</label>
+	    <input type="date" id="dateOfPurchase" name="dateOfPurchase" required
+	           value="{% if request.POST.dateOfPurchase %}{{ request.POST.dateOfPurchase }}{% else %}{{ today|date:'Y-m-d' }}{% endif %}"><br><br>
+
+	    <label for="expiryDate">Expiry Date:</label>
+	    <input type="date" id="expiryDate" name="expiryDate" required min="{{ today }}"
+	           value="{% if request.POST.expiryDate %}{{ request.POST.expiryDate }}{% else %}{% endif %}"><br><br>
+
+	    <button type="submit">Save</button>
+	</form>
+
+
+
+
+{% endblock body_block%}
+

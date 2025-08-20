@@ -1,0 +1,33 @@
+{% extends 'pharmacyapp/base.html' %}
+
+{% block body_block %}
+	{% if messages %}
+	<h2 class="messages">
+		{% for message in messages %}
+		<a{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</a>
+		{% endfor %}
+	</h2>
+	{% endif %}
+
+	<table>
+		<caption><h1>Bill Details </h1></caption>
+		<tr>
+			<th>ID</th>
+			<th>Name</th>
+			<th>Phone Number</th>
+		</tr>
+		<tr>
+			<td>{{ record.patientID }}</td>
+			<td>{{ record.patientName}}</td>
+			<td>{{ record.patientPhoneNo}}</td>
+		</tr>
+		</table>
+
+	{% if user.is_authenticated %}
+	<a <button type="submit" class="save btn btn-default" href="{% url 'medicine_order' pk=record.pk %}">Add</button></a>
+	<form method="POST" class="medicine-order">{% csrf_token %}
+	<button type="submit" class="save btn btn-default" name="order" value="order">Preview and Order</button>
+	</form>
+	{% endif %}
+
+{% endblock body_block%}

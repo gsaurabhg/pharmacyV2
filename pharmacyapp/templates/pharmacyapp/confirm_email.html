@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirm Email</title>
+</head>
+<body>
+    <h1>Database Dump Created</h1>
+    <p>Your database dump has been created successfully.</p>
+    <p> Location of the database in zipped format is: "{{ zip_path }}"</p>
+    <p>Do you want to send it via email?</p>
+
+    <form method="POST" action="{% url 'send_email' %}">
+        {% csrf_token %}
+        <input type="hidden" name="zip_path" value="{{ zip_path }}">
+        <input type="hidden" name="filename" value="{{ filename }}">
+
+        <label for="recipient_email">Recipient Email:</label>
+        <input type="email" id="recipient_email" name="recipient_email" required>
+
+        <label for="sender_password">Your Email Password:</label>
+        <input type="password" id="sender_password" name="sender_password" required>
+
+        <button type="submit">Yes, send the email</button>
+    </form>
+    <form method="POST" action="{% url 'welcome' %}">
+        {% csrf_token %}
+        <button type="submit">No, go back</button>
+    </form>
+</body>
+</html>

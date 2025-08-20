@@ -1,0 +1,40 @@
+<table id="{{ table_id }}" class="table table-bordered">
+    <thead>
+        <tr>
+            <th class="sort-column" onclick="sortTable(0, '{{ table_id }}')">Product Name<span class="sort-icon">▲▼</span></th>
+            <th class="sort-column" onclick="sortTable(1, '{{ table_id }}')">Batch No<span class="sort-icon">▲▼</span></th>
+            <th class="sort-column" onclick="sortTable(2, '{{ table_id }}')">Date of Expiry<span class="sort-icon">▲▼</span></th>
+            <th class="sort-column" onclick="sortTable(3, '{{ table_id }}')">Tablets/Unit Price<span class="sort-icon">▲▼</span></th>
+            {% if user.username == "admin" or user.username == "saurabhg" %}
+            <th onclick="sortTable(4, '{{ table_id }}')">Remaining tablets/units in store<span class="sort-icon">▲▼</span></th>
+            <th>Delete</th>
+            {% endif %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for medicineRecord in medicineList %}
+        <tr class="{% cycle 'even-row' 'odd-row' %}">
+            {% if user.username == "admin" or user.username == "saurabhg" %}
+            <td><a href="{% url 'med_detail' pk=medicineRecord.pk %}">{{ medicineRecord.medicine__medicineName }}</a></td>
+            {% else %}
+            <td>{{ medicineRecord.medicine__medicineName }}</td>
+            {% endif %}
+            <td>{{ medicineRecord.batchNo }}</td>
+            <td>{{ medicineRecord.procurement__expiryDate }}</td>
+            <td>{{ medicineRecord.procurement__pricePerTablet }}</td>
+            {% if user.username == "admin" or user.username == "saurabhg" %}
+            <td>{{ medicineRecord.noOfTabletsInStore }}</td>
+            <td>
+                <a href="{% url 'med_delete' pk=medicineRecord.pk active_tab=table_id %}"
+                   onclick="return confirmDelete('{{ medicineRecord.medicine__medicineName }}', '{{ medicineRecord.batchNo }}', '{% url 'inventory_list' %}?active_tab={{ table_id }}')">
+                    <!-- Using trash bin icon instead of text -->
+                    <button type="button" class="btn btn-danger">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </a>
+            </td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

@@ -1,0 +1,93 @@
+{% extends 'pharmacyapp/base.html' %}
+
+{% block body_block%}
+
+{% if messages %}
+<h2 class="messages">
+	{% for message in messages %}
+	<a{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</a>
+	{% endfor %}
+</h2>
+{% endif %}
+
+{% if billDet %}
+    <div id="printarea">
+	<div class="text-center mt-4">
+		<h1>Shree Sai Drug Shop</h1>
+		<h1>Medicine Bill - Return Sales</h1>
+	</div>
+    <table id="patDetails">
+        <tr>
+            <th class="patDetLeft">
+                Pt. Name: {{billDet.0.patientID.patientName}}</br>
+                ID : {{billDet.0.patientID.patientID}}</br>
+                Bill No: {{billDet.0.billNo}}
+            </th>
+            <th class="patDetRight">
+                Date: {{billDet.0.billDate}}</br>
+                Contact Details : {{billDet.0.patientID.patientPhoneNo}}
+            </th>
+        </tr>
+    </table>
+
+	<table id="cartMeds"  class="table table-striped">
+		<thead><tr>
+			<th>Product Name</th>
+			<th>Batch No</th>
+			<th>Date of expiry</th>
+			<th>Tablet/Unit price</th>
+			<th>Quantity Ordered</th>
+			<th>Price</th>
+			<th>Discount %</th>
+			<th>Price After Discount</th>
+			<th>Qty Returned</th>
+			<th>Refund Amount</th>
+			<th>Action</th>
+		</tr></thead>
+		<tbody>
+		{% for billDetail in billDet %}
+		<tr class="{% cycle 'even-row' 'odd-row' %}">
+			<td>{{ billDetail.medStock.medicine.medicineName }}</td>
+			<td>{{ billDetail.medStock.procurement.batchNo }}</td>
+			<td>{{ billDetail.medStock.procurement.expiryDate }}</td>
+			<td>{{ billDetail.medStock.procurement.pricePerTablet }}</td>
+			<td>{{ billDetail.noOfTabletsOrdered }}</td>
+			<td>{{ billDetail.totalPrice }}</td>
+			<td>{{ billDetail.discount }}</td>
+			<td>{{ billDetail.discountedPrice }}</td>
+			<td> {{ billDetail.returnSalesNoOfTablets }} </td>
+			<td>{{ billDetail.returnDiscountedPrice}}
+                    <td class="hidden-print">
+                        <a href="{% url 'meds_edit' pk=billDetail.pk %}">
+                            <button type="button" class="save btn btn-default">Return Tablets</button>
+                        </a>
+                    </td>
+		</tr>
+		{% endfor %}
+                <tr>
+                    <th colspan="9" style="text-align: right;">Total Refund</th>
+                    <th id="TP"></th>
+                    <th></th>
+                </tr>
+        </tbody>
+    </table>
+    </div>
+    {% if user.is_authenticated %}
+        <a href="/">
+            <button type="button" class="save btn btn-default">Home</button>
+        </a>
+        <button type="button" class="save btn btn-default" onclick="printReturnInvoice('printarea')">Generate Return Invoice</button>
+    {% endif %}
+{% else %}
+        <a href="/">
+            <button type="button" class="save btn btn-default">Home</button>
+        </a>
+{% endif %}
+
+{% if billDet %}
+    <body onload="finishTable_retMeds();">
+    </body>
+{% endif %}
+
+{% endblock %}
+

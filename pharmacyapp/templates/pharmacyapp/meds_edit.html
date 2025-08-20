@@ -1,0 +1,66 @@
+{% extends 'pharmacyapp/base.html' %}
+
+{% block sidenav_block %}
+    {% if billAdjust.patientID %}
+        <a> Patient ID : {{ billAdjust.patientID.patientID }}</a><br>
+        <a> Name: {{ billAdjust.patientID.patientName }}</a><br>
+        <a> Contact Details : {{ billAdjust.patientID.patientPhoneNo }}</a><br>
+    {% else %}
+        <p>No Patient Info Available.</p>
+    {% endif %}
+{% endblock %}
+
+{% block body_block %}
+
+    {% if messages %}
+        <h2 class="messages">
+            {% for message in messages %}
+                <a{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</a>
+            {% endfor %}
+        </h2>
+    {% endif %}
+
+    <div class="text-center mt-4">
+        <h1>Medicine Return Entry</h1>
+    </div>
+
+    <form method="POST" class="post-form">{% csrf_token %}
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Product Name</th>
+                    <th>Batch No</th>
+                    <th>Expiry Date</th>
+                    <th>Tablet/Unit Price</th>
+                    <th>Quantity Ordered</th>
+                    <th>Price</th>
+                    <th>Discount %</th>
+                    <th>Price After Discount</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{ billAdjust.medStock.medicine.medicineName }}</td>
+                    <td>{{ billAdjust.medStock.procurement.batchNo }}</td>
+                    <td>{{ billAdjust.medStock.procurement.expiryDate }}</td>
+                    <td>{{ billAdjust.medStock.procurement.pricePerTablet }}</td>
+                    <td>{{ billAdjust.noOfTabletsOrdered }}</td>
+                    <td>{{ billAdjust.totalPrice }}</td>
+                    <td>{{ billAdjust.discount }}</td>
+                    <td>{{ billAdjust.discountedPrice }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="form-group">
+            <label for="meds2Return"><strong>Total Meds To Return</strong></label>
+            <input type="number" id="meds2Return" name="meds2Return" min="1" class="form-control" style="max-width: 200px;" required />
+        </div>
+
+        <div class="form-group mt-3">
+            <button type="submit" class="save btn btn-default" name="returnMeds" value="returnMeds">Return Medicines</button>
+            <button type="submit" class="save btn btn-default" name="back" value="back">Back</button>
+        </div>
+    </form>
+
+{% endblock body_block %}

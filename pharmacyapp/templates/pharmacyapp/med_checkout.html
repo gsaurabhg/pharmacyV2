@@ -1,0 +1,88 @@
+{% extends 'pharmacyapp/base.html' %}
+
+{% block sidenav_block %}
+	{% if billGeneration %}
+		<a> Patient ID : {{billGeneration.0.patientID.patientID}}</a></br>
+		<a> Name: {{billGeneration.0.patientID.patientName}}</a></br>
+		<a> Contact Details : {{billGeneration.0.patientID.patientPhoneNo}}</a></br>
+	{% else %}
+		<p>No Meds in Cart.</p>
+	{% endif %}
+{% endblock %}
+
+{% block body_block %}
+	{% if messages %}
+	<h2 class="messages">
+		{% for message in messages %}
+			<a{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</a>
+		{% endfor %}
+	</h2>
+	{% endif %}
+
+	{% if billGeneration %}
+		<div class="text-center mt-4">
+			<h1>List of Medicines in Cart</h1>
+		</div>
+		<tbody>
+		<table id="cartMeds" class="table table-striped">
+			<thead><tr>
+				<th>Product Name</th>
+				<th>Batch No</th>
+				<th>Date of Expiry</th>
+				<th>Tablet/Unit Price</th>
+				<th>Quantity Ordered</th>
+				<th>Price</th>
+				<th>Discount %</th>
+				<th>Price After Discount</th>
+				<th>Remove</th>
+			</tr></thead>
+
+			{% for billDetail in billGeneration %}
+				<tr class="{% cycle 'even-row' 'odd-row' %}">
+					<td>{{ billDetail.medStock.medicine.medicineName }}</td>
+					<td>{{ billDetail.medStock.procurement.batchNo }}</td>
+					<td>{{ billDetail.medStock.procurement.expiryDate }}</td>
+					<td>{{ billDetail.medStock.procurement.pricePerTablet }}</td>
+					<td>{{ billDetail.noOfTabletsOrdered }}</td>
+					<td>{{ billDetail.totalPrice }}</td>
+					<td>{{ billDetail.discount }}</td>
+					<td>{{ billDetail.discountedPrice }}</td>
+					<td>
+						<a href="{% url 'medicine_remove' pk=billDetail.pk %}" onclick="return confirm('Are you sure you want to remove this medicine?');">
+							<button type="button" class="save btn btn-danger">
+								<i class="fas fa-trash-alt"></i> <!-- Trash icon -->
+							</button>
+						</a>
+					</td>
+				</tr>
+			{% endfor %}
+			<tr>
+				<th> Total Bill</th>
+				<th></th>
+				<th></th>
+				<th></th>
+				<th></th>
+				<th id="TP"></th>
+				<th></th>
+				<th id="TDP"></th>
+				<th></th>
+			</tr>
+			</tbody>
+		</table>
+		{% if user.is_authenticated %}
+			<a href="{% url 'medicine_order' pk=billGeneration.0.patientID.pk %}">
+			    <button type="button" class="save btn btn-default">Add Medicine</button>
+			</a>
+			<a href="{% url 'medicine_checkout' pk=billGeneration.0.patientID.pk %}">
+				<button type="submit" class="save btn btn-default">Final Billing</button>
+			</a>
+		{% endif %}
+	{% endif %}
+
+	{% if billGeneration %}
+		<script type="text/javascript" src="/static/js/jscript-queries.js"></script>
+		<body onload="finishTable();">
+		</body>
+	{% endif %}
+{% endblock %}
+

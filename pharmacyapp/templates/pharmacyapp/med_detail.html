@@ -1,0 +1,48 @@
+{% extends 'pharmacyapp/base.html' %}
+
+{% block body_block %}
+    {% if messages %}
+    <h2 class="messages">
+        {% for message in messages %}
+        <a{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</a>
+        {% endfor %}
+    </h2>
+    {% endif %}
+
+    <!-- Centered heading with responsive behavior -->
+    <div class="table-header">
+        <h1>Product Details</h1>
+    </div>
+    <table class="table-bordered">
+        <thead>
+        <tr>
+            <th>Product Name</th>
+            <th>Product Category</th>
+            <th>Batch No</th>
+            <th>Date of purchase</th>
+            <th>Date of expiry</th>
+            <th>Tablets per strip/Units per pack</th>
+            <th>Strip/Pack purchased</th>
+            <th>Strip/Pack price</th>
+            <th>M.R.P.</th>
+            <th>Total Tablets/Units</th>
+            <th>Remaining tablets/units in store</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="{% cycle 'odd-row' 'even-row' %}">
+            <td><a href="{% url 'med_detail' pk=MedicineStock.pk %}">{{ MedicineStock.medicine.medicineName }}</a></td>
+            <td>{{ MedicineStock.medicine.medCategory.name }}</td>
+            <td>{{ MedicineStock.batchNo }}</td>
+            <td>{{ MedicineStock.procurement.dateOfPurchase }}</td>
+            <td>{{ MedicineStock.procurement.expiryDate}}</td>
+            <td>{{ MedicineStock.procurement.pack }}</td>
+            <td>{{ MedicineStock.procurement.quantity}}</td>
+            <td>{{ MedicineStock.procurement.pricePerStrip}}</td>
+            <td>{{ MedicineStock.procurement.mrp }}</td>
+            <td>{{ MedicineStock.procurement.noOfTablets}}</td>
+            <td>{{ MedicineStock.noOfTabletsInStore}}</td>
+        </tr>
+        </tbody>
+    </table>
+{% endblock body_block%}

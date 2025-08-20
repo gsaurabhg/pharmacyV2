@@ -1,0 +1,103 @@
+{% extends 'pharmacyapp/base.html' %}
+
+{% block body_block %}
+<div class="row">
+    <div class="col-md-4">
+        <form method="POST" class="report-form">
+            {% csrf_token %}
+            <h3>Quick Sales Report</h3>
+            <div class="mb-3">
+                <button type="submit" class="btn btn-primary" name="Today" value="Today">Today's Sale</button>
+                <button type="submit" class="btn btn-primary" name="Yesterday" value="Yesterday">Yesterday's Sale</button>
+            </div>
+
+            <hr />
+
+            <h3>Time Frame Sales Report</h3>
+
+            <div class="mb-3">
+                {{ form.startDate.label_tag }}
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-calendar-event"></i></span>
+                    {{ form.startDate }}
+                </div>
+            </div>
+
+            <div class="mb-3">
+                {{ form.endDate.label_tag }}
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-calendar-event"></i></span>
+                    {{ form.endDate }}
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="{{ form.medicineName.id_for_label }}">Medicine</label>
+                <select name="{{ form.medicineName.html_name }}" id="{{ form.medicineName.id_for_label }}" class="form-select">
+                    <option value="">{{ form.medicineName.empty_label }}</option>
+                    {% for med in form.fields.medicineName.queryset %}
+                    <option value="{{ med.id }}" {% if form.medicineName.value|stringformat:"s" == med.id|stringformat:"s" %}selected{% endif %}>{{ med.medicineName }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary" name="custom" value="custom">Search</button>
+        </form>
+
+        {% if messages %}
+        <ul class="messages mt-3">
+            {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </div>
+
+    <div class="col-md-8">
+        <div id="printarea">
+            <table class="table table-striped" id="daysales">
+                <caption><h1>Sales Report</h1></caption>
+                <thead>
+                    <tr>
+                        <th>Bill Date</th>
+                        <th>Bill Number</th>
+                        <th>Product Name</th>
+                        <th>Batch Number</th>
+                        <th>Unit Sold</th>
+                        <th>Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if reports %}
+                        {% for report in reports %}
+                        <tr>
+                            <td>{{ report.billDate }}</td>
+                            <td>{{ report.billNo }}</td>
+                            <td>{{ report.medStock.medicine.medicineName }}</td>
+                            <td>{{ report.medStock.batchNo }}</td>
+                            <td>{{ report.noOfTabletsOrdered }}</td>
+                            <td>{{ report.discountedPrice }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr><td colspan="6" class="text-center">No records found.</td></tr>
+                    {% endif %}
+                    <tr>
+                        <th>Total Sales</th>
+                        <th></th><th></th><th></th><th></th>
+                        <th id="TPP"></th>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        {% if user.is_authenticated %}
+        <button type="button" class="btn btn-primary" onclick="printDiv('printarea')">Print</button>
+        {% endif %}
+    </div>
+</div>
+
+{% if reports %}
+<body onload="finishTable_v1(5);"></body>
+{% endif %}
+{% endblock %}

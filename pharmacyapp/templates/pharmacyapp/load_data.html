@@ -1,0 +1,19 @@
+<!-- templates/load_data.html -->
+
+<form method="post" enctype="multipart/form-data" action="{% url 'load_data' %}" onsubmit="return confirmLoadData();">
+    {% csrf_token %}
+    <label for="zip_file">Upload Zip File:</label>
+    <input type="file" id="zip_file" name="zip_file" accept=".zip" required>
+    <button type="submit">Load Data</button>
+</form>
+
+<form method="POST" action="{% url 'welcome' %}">
+        {% csrf_token %}
+        <button type="submit">No, go back</button>
+</form>
+
+<script>
+function confirmLoadData() {
+    return confirm("Are you sure you want to flush old data and load new data from the uploaded JSON file?");
+}
+</script>

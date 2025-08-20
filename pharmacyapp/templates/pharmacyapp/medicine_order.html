@@ -1,0 +1,42 @@
+{% extends 'pharmacyapp/base.html' %}
+
+{% block body_block %}
+	{% if messages %}
+	<h2 class="messages">
+		{% for message in messages %}
+		<a{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</a>
+		{% endfor %}
+	</h2>
+	{% endif %}
+
+	<h1>Billing Information</h1>
+	<form method="POST" class="medicine-order">{% csrf_token %}
+	        <p><a>Medicine Name</a></p>
+	        <p><select name="medicineName" id="medicineName" onmousedown="this.value='';" onchange="get_batch_no(this.value);">
+				<option value="" disabled selected>Select Medicine</option>  <!-- Placeholder -->
+				{% for choice in form.medicineName.field.choices %}
+				  <option value="{{ choice.0 }}">{{ choice.1 }}</option>
+				{% endfor %}
+	        </select></p>
+
+	        <p><a>Batch Number:</a></p>
+	        <p><select name="batchNo" id="batchNo" disabled="true" onmousedown="this.value='';" onchange="get_quantity(this.value);">
+	            <option value=""disabled selected>Select Batch Number</option>
+	        </select></p>
+
+	        <p><a>Quantity (Tablet/Bottle):</a></p>
+	        <p><a>{{form.orderQuantity}}</a></p>
+	        <a id="quantity"></a>
+
+	        <p><a>Discount:</a></p>
+	        <p><a>{{form.discount}}</a></p>
+
+	        <button type="submit" class="save btn btn-default" name="addMed" value="addMed" id="addMedicineBtn">Add Medicine</button>
+	        <button type="submit" class="save btn btn-default" name="order" value="order">Proceed for Billing</button>
+			<script type="text/javascript" src="/static/js/jscript-queries.js"></script>
+    </form>
+
+
+
+{% endblock %}
+

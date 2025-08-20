@@ -1,0 +1,105 @@
+{% extends 'pharmacyapp/base.html' %}
+{% block body_block%}
+{% if billGeneration %}
+    <div id="printarea">
+    <table id="shopHead">
+        <tbody>
+            <tr class="shopHeading">
+               <th class="shopNameLeft"> Shree Sai Drug Shop</th>
+               <th class="shopNameRight">
+                    C1, Vikram Colony,</br>
+                    Aligarh. Ph.: 0571-2742424
+               </th>
+            </tr>
+        </tbody>
+    </table>
+    <table id="patDetails">
+        <tr>
+            <th class="patDetLeft">
+                Pt. Name: {{billGeneration.0.patientID.patientName}}</br>
+                Bill No: {{billGeneration.0.billNo}}
+            </th>
+            <th class="patDetRight">
+                Date: {{billGeneration.0.billDate}}</br>
+                Contact Details : {{billGeneration.0.patientID.patientPhoneNo}}
+            </th>
+        </tr>
+    </table>
+
+	{% if billGeneration %}
+		<div class="text-center mt-4">
+			<h1>Final Bill</h1>
+		</div>
+		<tbody>
+		<table id="cartMeds" class="table table-striped">
+			<thead><tr>
+				<th>Medicines</th>
+				<th>Batch No</th>
+				<th>Expiry Date</th>
+				<th>Unit Price</th>
+				<th>QTY.</th>
+				<th>Price(&#8377;)</th>
+				<th>Discounted Price (&#8377;)</th>
+			</tr></thead>
+
+			{% for billDetail in billGeneration %}
+				<tr class="{% cycle 'even-row' 'odd-row' %}">
+					<td>{{ billDetail.medStock.medicine.medicineName }}</td>
+					<td>{{ billDetail.medStock.batchNo }}</td>
+					<td>{{ billDetail.medStock.procurement.expiryDate }}</td>
+					<td>{{ billDetail.medStock.procurement.pricePerTablet }}<c/td>
+					<td>{{ billDetail.noOfTabletsOrdered }}</td>
+					<td>{{ billDetail.totalPrice }}</td>
+					<td>{{ billDetail.discountedPrice }}</td>
+				</tr>
+			{% endfor %}
+			<tr>
+				<th> Total Bill</th>
+				<th></th>
+				<th></th>
+				<th></th>
+				<th></th>
+				<th id="TP"></th>
+				<th id="TDP"></th>
+			</tr>
+			</tbody>
+	    </table>
+	{% endif %}
+    <d class="footNote">&nbsp;&nbsp;
+    (&#2325;&#2335;&#2366;
+    &#2346;&#2340;&#2381;&#2340;&#2366;
+    &#2357;&#2366;&#2346;&#2367;&#2360;
+    &#2344;&#2361;&#2368;&#2306; &#2325;&#2367;&#2351;&#2366; &#2332;&#2366; &#2360;&#2325;&#2340;&#2366;)
+    </d></br>
+    <d class="footNote">&nbsp;&nbsp;
+    (&#2342;&#2357;&#2366;
+    &#2357;&#2366;&#2346;&#2360;&#2368;
+    &#2407;&#2406;
+    &#2342;&#2367;&#2344;
+    &#2325;&#2375;
+    &#2349;&#2368;&#2340;&#2352; &#2404;
+    &#2325;&#2371;&#2346;&#2351;&#2366;
+    &#2348;&#2367;&#2354;
+    &#2360;&#2366;&#2341;
+    &#2354;&#2366;&#2319;&#2375;&#2306;
+    &#2404;)
+    </d>
+    <div class="rightAlign"> Auth. Sign.&nbsp;&nbsp;&nbsp;&nbsp;</div>
+    </div>
+    {% if user.is_authenticated %}
+    <script type="text/javascript" src="/static/js/jscript-queries.js"></script>
+    <input type="button" onclick="printDiv('printarea')" value="Print Bill" />
+    <a <button type="submit" class="save btn btn-default" href="/">Home</button></a>
+    {% endif %}
+{% else %}
+	<a <button type="submit" class="save btn btn-default" href="/">Home</button></a>
+{% endif %}
+
+{% if billGeneration %}
+    <body onload="finishTable_2ClmnSum(5,6);">
+    <script type="text/javascript" src="/static/js/jscript-queries.js"></script>
+    </body>
+{% endif %}
+
+{% endblock %}
+

@@ -1,0 +1,38 @@
+{% extends 'pharmacyapp/base.html' %}
+
+{% block body_block %}
+    <form action="" method="post" name="Pls Select">
+        <table>
+            <!-- Ensure the caption is inside the table and not wrapped in another block element -->
+            <caption><h1>Please select the Patient</h1></caption>
+            <thead><tr>
+                <th>Patient ID</th>
+                <th>Patient Name</th>
+                <th>Phone Number</th>
+                <th>Add Medicines</th>
+                <th>Medicines in Cart</th>
+                <th>Last Bill</th>
+            </tr></thead>
+            {% for patientDetail in patientRecord %}
+            <tr class="{% cycle 'even-row' 'odd-row' %}">
+                <td>{{ patientDetail.patientID }}</td>
+                <td>{{ patientDetail.patientName}}</td>
+                <td>{{ patientDetail.patientPhoneNo}}</td>
+                <td><a <button type="submit" class="save btn btn-default" href="{% url 'medicine_order' pk=patientDetail.pk %}">Add</button></a></td>
+                <td><a <button type="submit" class="save btn btn-default" href="{% url 'bill_details' pk=patientDetail.pk %}" name="order" value="order">View Ordered Medicines</button></a></td>
+                <td><a <button type="submit" class="save btn btn-default" href="{% url 'medicine_last_checkout' pk=patientDetail.pk %}" name="previousBill" value="previousBill">Previous Bill</button></a></td>
+            </tr>
+            {% endfor %}
+        </table>
+    </form>
+
+    {% if user.is_authenticated %}
+        <a <button type="submit" class="save btn btn-default" href="{% url 'patient_details' %}">Back</button></a>
+        <a <button type="submit" class="save btn btn-default" href="{% url 'patient_details' %}">New Registration</button></a>
+    {% endif %}
+{% endblock body_block %}
+
+<a <button type="submit" class="save btn btn-default" href="{% url 'medicine_order' pk=record.pk %}">Add</button></a>
+<form method="POST" class="medicine-order">{% csrf_token %}
+    <button type="submit" class="save btn btn-default" name="order" value="order">Preview and Order</button>
+</form>

@@ -1,0 +1,20 @@
+{% extends 'pharmacyapp/base.html' %}
+
+
+
+{% block body_block %}
+	{% if messages %}
+	<h2 class="messages">
+		{% for message in messages %}
+		<a{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</a>
+		{% endfor %}
+	</h2>
+	{% endif %}
+
+	<h1>Medicine to be removed from Cart</h1>
+	<form method="POST" class="medicine-remove">{% csrf_token %}
+		<button type="submit" class="save btn btn-default" name="remove" value="remove">Remove medicines</button>
+	</form>
+
+
+{% endblock %}

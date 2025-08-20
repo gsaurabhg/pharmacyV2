@@ -1,0 +1,65 @@
+{% extends 'pharmacyapp/base.html' %}
+
+{% block sidenav_block %}
+    <!-- Sidebar remains unchanged -->
+{% endblock %}
+
+{% block body_block %}
+    {% if messages %}
+    <h2 class="messages">
+        {% for message in messages %}
+        <a{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</a>
+        {% endfor %}
+    </h2>
+    {% endif %}
+
+    <!-- "Add New Products" Tab Above Products in Stock (Below Navbar) -->
+    <div class="container mt-4">
+        <!-- Create a new tab for "Add New Product" -->
+        <ul class="nav nav-pills">
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'procurement_form' %}">
+                    Add New Products
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Centering the "Products in Stock" Title -->
+    <div class="text-center mt-4">
+        <h1>Products in Stock</h1>
+    </div>
+
+    <!-- Dynamic Tab Navigation for Categories (Below the "Add New Products" Tab) -->
+    <ul class="nav nav-tabs">
+        {% for category in categories %}
+            <li class="nav-item {% if active_tab == category.name %}active{% endif %}">
+                <a class="nav-link" id="{{ category.name }}-tab" data-toggle="tab" href="#{{ category.name }}">
+                    {{ category.name }}
+                </a>
+            </li>
+        {% endfor %}
+        <li class="nav-item {% if active_tab == 'expired_nill' %}active{% endif %}">
+            <a class="nav-link" id="expired_nill-tab" data-toggle="tab" href="#expired_nill">Expired or Out Of Stock</a>
+        </li>
+    </ul>
+
+    <!-- Dynamic Tab Content for Categories -->
+    <div class="tab-content">
+        {% for category_data in medicines.items %}
+            <div id="{{ category_data.0 }}" class="tab-pane {% if active_tab == category_data.0 %}show active{% endif %}">
+                {% if category_data.1 %}
+                    {% include 'pharmacyapp/med_list.html' with medicineList=category_data.1 table_id="stock-table-{{ category_data.0|lower }}" %}
+                {% else %}
+                    <p>No medicines available in this category.</p>
+                {% endif %}
+            </div>
+        {% endfor %}
+
+        <!-- Expired or Out of Stock Content -->
+        <div id="expired_nill" class="tab-pane {% if active_tab == 'expired_nill' %}show active{% endif %}">
+            {% include 'pharmacyapp/med_list.html' with medicineList=expired_nill table_id="stock-table-expired" %}
+        </div>
+    </div>
+
+{% endblock %}

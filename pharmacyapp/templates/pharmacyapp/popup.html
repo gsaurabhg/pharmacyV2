@@ -1,0 +1,54 @@
+{% extends 'pharmacyapp/base.html' %}
+
+
+{% block body_block %}
+    <style>
+        .container {
+            display: flex;
+        }
+
+        .pharmacy-container {
+            flex: auto auto auto; /* Don't allow the image to grow or shrink */
+            margin-right: 20px; /* Adjust the spacing between the image and text */
+        }
+
+        .pharmacy-image {
+            max-width: auto; /* Adjust the width as needed */
+            height: auto;
+        }
+
+        .text-container {
+            flex: 1; /* Allow text to take remaining space */
+        }
+
+        .newClass {
+            margin: 0; /* Reset margin */
+            font-size: 30px; /* Adjust font size as needed */
+            color: green;
+        }
+		/* Hide the image on screens smaller than 768px (typically mobile devices) */
+        @media screen and (max-width: 768px) {
+            .pharmacy-image {
+                display: none;
+            }
+        }
+    </style>
+    {% if messages %}
+    <h2 class="messages">
+        {% for message in messages %}
+        <a{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</a>
+        {% endfor %}
+    </h2>
+    {% endif %}
+
+    <div class="container">
+        <div class="pharmacy-container">
+            <img src="..\static\images\pharmacy.jpg" alt="Welcome" class="pharmacy-image">
+        </div>
+        <div class="text-container">
+            <h3 class="newClass">Shree Sai Drug Shop</h3>
+            <h3 class="newClass">C1-Vikram Colony</h3>
+            <h3 class="newClass">Aligarh</h3>
+        </div>
+    </div>
+{% endblock %}
