@@ -57,6 +57,10 @@ class PurchaseReportForm(forms.Form):
     )
     batchNo = forms.CharField(label="Batch Number", max_length=50, required=False)
 
+# Form to register a patient to queue
+class PatientQueueForm(forms.Form):
+    patient = forms.ModelChoiceField(queryset=PatientDetail.objects.all(), label="Select Patient")
+
 
 class medsAdjustForm(forms.ModelForm):
     class Meta:

@@ -27,4 +27,7 @@ urlpatterns = [
     path('dump-database/', views.dump_database_view, name='dump_database'),
     path('send-email/', views.send_email_view, name='send_email'),
     path('load-data/', views.load_data_view, name='load_data'),
+    path('queue/', views.patient_queue, name='patient_queue'),
+    path('queue/serve/<int:entry_id>/', views.serve_patient, name='serve_patient'),
+    path('queue/clear-served/', views.clear_served_patients, name='clear_served_patients'),
 ]

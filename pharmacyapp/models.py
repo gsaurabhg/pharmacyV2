@@ -4,7 +4,6 @@ from django.core.validators import MinValueValidator
 from decimal import *
 from django.db import transaction
 
-
 # Purpose: This table holds medicine categories (e.g., Ob-Gyn, Urology, General Medicine, etc.).
 # Field name: The name of the category (e.g., "Ob-Gyn", "Urology").
 # Usage: Each medicine will be assigned to one of these categories.
@@ -160,6 +159,33 @@ class PatientDetail(models.Model):
 
     def __str__(self):
         return self.patientID
+
+#
+#Fields:
+#queued_at: when patient enters queue
+#is_served: whether they've been served
+#served_at: timestamp when served
+#These fields let us list which patients are waiting and in which order, and mark them as done.
+#
+
+class PatientQueueEntry(models.Model):
+    patient = models.ForeignKey(PatientDetail, on_delete=models.CASCADE)
+    queued_at = models.DateTimeField(default=timezone.now)
+    is_served = models.BooleanField(default=False)
+    served_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ['is_served', 'queued_at']  # pending first, then served chronologically
+
+    def mark_served(self):
+        self.is_served = True
+        self.served_at = timezone.now()
+        self.save()
+
+    def __str__(self):
+        status = 'Served' if self.is_served else 'Waiting'
+        return f"{self.patient.patientName} ({status}) queued at {self.queued_at}"
+
 
 DISCOUNT_CHOICES = ((0, 0), (5, 5), (10, 10))
 

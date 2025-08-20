@@ -265,6 +265,44 @@ def patient_details(request):
         form = PatientForm()
     return render(request, 'pharmacyapp/patient_details.html', {'form': form})
 
+def patient_queue(request):
+    form = PatientQueueForm(request.POST or None)
+    if request.method == 'POST' and form.is_valid():
+        patient = form.cleaned_data['patient']
+        
+        # Check if the patient is already in queue and not yet served
+        already_in_queue = PatientQueueEntry.objects.filter(patient=patient, is_served=False).exists()
+        
+        if already_in_queue:
+            messages.warning(request, f"{patient.patientName} is already in the queue.")
+        else:
+            PatientQueueEntry.objects.create(patient=patient)
+            messages.success(request, f"{patient.patientName} added to queue.")
+        
+        return redirect('patient_queue')
+
+    queue = PatientQueueEntry.objects.filter(is_served=False)
+    served = PatientQueueEntry.objects.filter(is_served=True)
+
+    context = {
+        'form': form,
+        'queue': queue,
+        'served': served,
+    }
+    return render(request, 'pharmacyapp/patient_queue.html', context)
+
+
+def serve_patient(request, entry_id):
+    entry = get_object_or_404(PatientQueueEntry, id=entry_id)
+    entry.mark_served()
+    messages.success(request, f"{entry.patient.patientName} has been marked as served.")
+    return redirect('patient_queue')
+
+def clear_served_patients(request):
+    if request.method == 'POST':
+        PatientQueueEntry.objects.filter(is_served=True).delete()
+    return redirect('patient_queue')  # update with your queue view name
+    
 @login_required    
 def bill_details(request, pk):
     record = get_object_or_404(PatientDetail, pk=pk)
@@ -275,7 +313,6 @@ def bill_details(request, pk):
     else:
         return render(request, 'pharmacyapp/med_checkout.html',{'billGeneration': billGeneration})
 
-    
 
 @login_required    
 def medicine_order(request, pk):

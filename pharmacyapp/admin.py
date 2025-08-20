@@ -26,7 +26,12 @@ admin.site.register(Category)  # Register Category model
 admin.site.register(Medicine, MedicineAdmin) 
 #admin.site.register(MedicineStock, MedicineStockAdmin)
 
-
+@admin.register(PatientQueueEntry)
+class PatientQueueEntryAdmin(admin.ModelAdmin):
+    list_display = ['patient', 'queued_at', 'is_served', 'served_at']
+    list_filter = ['is_served']
+    ordering = ['is_served', 'queued_at']
+    
 admin.site.register(PatientDetail)
 admin.site.register(Bill)
 admin.site.register(Sale)
