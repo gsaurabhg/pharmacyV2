@@ -501,6 +501,37 @@ def report_sales(request):
 
     return render(request, 'pharmacyapp/report_sales.html', {'form': form, 'reports': reports})
 
+def report_purchases(request):
+    form = PurchaseReportForm(request.POST or None)
+    reports = None
+
+    if request.method == 'POST':
+        if form.is_valid():
+            start_date = form.cleaned_data.get('startDate')
+            end_date = form.cleaned_data.get('endDate')
+            medicine = form.cleaned_data.get('medicineName')
+            batch_no = form.cleaned_data.get('batchNo')
+
+            reports = MedicineProcureDetails.objects.all()
+
+            if start_date:
+                reports = reports.filter(dateOfPurchase__gte=start_date)
+            if end_date:
+                reports = reports.filter(dateOfPurchase__lte=end_date)
+            if medicine:
+                reports = reports.filter(medicine=medicine)
+            if batch_no:
+                reports = reports.filter(batchNo__icontains=batch_no)
+
+            if not reports.exists():
+                messages.info(request, "No matching records found.")
+
+    context = {
+        'form': form,
+        'reports': reports
+    }
+    return render(request, 'pharmacyapp/report_purchases.html', context)
+
 
 def report_returns(request):
     form = ReportForm(request.POST or None)

@@ -46,6 +46,18 @@ class ReportForm(forms.Form):
         empty_label="All Medicines"
     )
 
+# Form for filtering the purchase report
+class PurchaseReportForm(forms.Form):
+    startDate = forms.DateField(label="Start Date", required=False, widget=forms.DateInput(attrs={'type': 'date'}))
+    endDate = forms.DateField(label="End Date", required=False, widget=forms.DateInput(attrs={'type': 'date'}))
+    medicineName = forms.ModelChoiceField(
+        queryset=Medicine.objects.all(),
+        required=False,
+        empty_label="Select Medicine"
+    )
+    batchNo = forms.CharField(label="Batch Number", max_length=50, required=False)
+
+
 class medsAdjustForm(forms.ModelForm):
     class Meta:
         model = Bill

@@ -13,17 +13,12 @@
     </h2>
     {% endif %}
 
-    <!-- "Add New Products" Tab Above Products in Stock (Below Navbar) -->
-    <div class="container mt-4">
-        <!-- Create a new tab for "Add New Product" -->
-        <ul class="nav nav-pills">
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'procurement_form' %}">
-                    Add New Products
-                </a>
-            </li>
-        </ul>
-    </div>
+
+	<a href="{% url 'procurement_form' %}"
+	   class="btn btn-danger btn-lg"
+	   style="position: fixed; bottom: 30px; right: 30px; z-index: 1000;">
+	   ➕ Add New
+	</a>
 
     <!-- Centering the "Products in Stock" Title -->
     <div class="text-center mt-4">

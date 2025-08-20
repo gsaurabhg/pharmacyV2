@@ -11,6 +11,7 @@ urlpatterns = [
     path('get-pack-size/', views.get_pack_size, name='get_pack_size'),
     path('med/<int:pk>/<str:active_tab>/', views.med_delete, name='med_delete'),
     url(r'^post/report/sales/$', views.report_sales, name='report_sales'),
+    url(r'^post/report/returns/$', views.report_purchases, name='report_purchases'),
     url(r'^post/report/returns/$', views.report_returns, name='report_returns'),
     url(r'^patient/details/$', views.patient_details, name='patient_details'),
     url(r'^Patient/details/(?P<pk>\d+)/$', views.bill_details, name='bill_details'),
