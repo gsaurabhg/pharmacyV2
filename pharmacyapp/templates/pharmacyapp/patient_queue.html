@@ -77,10 +77,6 @@
 
   <div class="col-md-6">
     <h3>Current Patient Queue</h3>
-    <form method="POST" action="{% url 'clear_served_patients' %}">
-      {% csrf_token %}
-      <button type="submit" class="btn btn-danger mb-3">Clear All Served</button>
-    </form>
 
     {% if queue %}
       <ul class="list-group mb-4">
@@ -110,6 +106,10 @@
     {% endif %}
 
     <h3>Served Patients</h3>
+    <form method="POST" action="{% url 'clear_served_patients' %}">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger mb-3">Clear All Served</button>
+    </form>
     {% if served %}
       <ul class="list-group">
         {% for entry in served %}
