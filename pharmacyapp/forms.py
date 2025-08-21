@@ -18,10 +18,26 @@ class CombinedForm(forms.ModelForm):
 
 
 
+
 class PatientForm(forms.ModelForm):
+    queue_type = forms.ChoiceField(
+        choices=PatientQueueEntry.QUEUE_TYPE_CHOICES,
+        widget=forms.RadioSelect,
+        initial='current',
+        label="Add to Queue"
+    )
+
     class Meta:
         model = PatientDetail
-        fields = ('patientID','patientName', 'patientPhoneNo')
+        fields = ['patientName', 'patientPhoneNo', 'patientAadharNumber']
+    
+    def clean_patientAadharNumber(self):
+        aadhar = self.cleaned_data['patientAadharNumber'].upper()
+        # Check if this Aadhaar already exists
+        if PatientDetail.objects.filter(patientAadharNumber=aadhar).exists():
+            # Instead of raising ValidationError, just mark this for view to handle
+            raise forms.ValidationError("Patient detail with this Aadhaar Number already exists.")
+        return aadhar
 
 
 Discount= ((0,0),(5,5),(10,10))

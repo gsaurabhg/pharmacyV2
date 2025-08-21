@@ -28,6 +28,7 @@ urlpatterns = [
     path('send-email/', views.send_email_view, name='send_email'),
     path('load-data/', views.load_data_view, name='load_data'),
     path('queue/', views.patient_queue, name='patient_queue'),
+    path('queue/add/', views.add_patient_to_queue, name='add_patient_to_queue'),
     path('queue/serve/<int:entry_id>/', views.serve_patient, name='serve_patient'),
     path('queue/clear-served/', views.clear_served_patients, name='clear_served_patients'),
 ]

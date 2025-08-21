@@ -3,6 +3,7 @@ from django.utils import timezone
 from django.core.validators import MinValueValidator
 from decimal import *
 from django.db import transaction
+from django.core.validators import RegexValidator
 
 # Purpose: This table holds medicine categories (e.g., Ob-Gyn, Urology, General Medicine, etc.).
 # Field name: The name of the category (e.g., "Ob-Gyn", "Urology").
@@ -153,9 +154,20 @@ class PatientDetail(models.Model):
     patientID = models.CharField("Patient ID",max_length=50, blank=True)
     patientName = models.CharField("Name",max_length=50, blank=True)
     patientPhoneNo = models.PositiveSmallIntegerField("Phone Number", blank=True, default = '0')
+    # Aadhaar: must be exactly 12 digits
+    patientAadharNumber = models.CharField(
+        "Aadhaar Number",
+        max_length=12,
+        validators=[RegexValidator(regex=r'^\d{12}$', message='Aadhaar must be exactly 12 digits')],
+        unique=True,
+        blank=False,
+        null=False
+    )
 
-    def publish(self):
-        self.save()
+    def save(self, *args, **kwargs):
+        if self.patientAadharNumber:
+            self.patientAadharNumber = self.patientAadharNumber.upper()  # ensure uppercase
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.patientID
@@ -169,22 +181,20 @@ class PatientDetail(models.Model):
 #
 
 class PatientQueueEntry(models.Model):
+    QUEUE_TYPE_CHOICES = (
+        ('current', 'Current Queue'),
+        ('followup', 'Follow Up Queue'),
+    )
     patient = models.ForeignKey(PatientDetail, on_delete=models.CASCADE)
-    queued_at = models.DateTimeField(default=timezone.now)
+    queued_at = models.DateTimeField(auto_now_add=True)
     is_served = models.BooleanField(default=False)
     served_at = models.DateTimeField(null=True, blank=True)
-
-    class Meta:
-        ordering = ['is_served', 'queued_at']  # pending first, then served chronologically
+    queue_type = models.CharField(max_length=10, choices=QUEUE_TYPE_CHOICES, default='current')
 
     def mark_served(self):
         self.is_served = True
         self.served_at = timezone.now()
         self.save()
-
-    def __str__(self):
-        status = 'Served' if self.is_served else 'Waiting'
-        return f"{self.patient.patientName} ({status}) queued at {self.queued_at}"
 
 
 DISCOUNT_CHOICES = ((0, 0), (5, 5), (10, 10))

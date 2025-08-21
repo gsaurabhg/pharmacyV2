@@ -233,6 +233,9 @@ def patient_details(request):
                 query |= Q(patientID__iexact=patientIDToSearch)
             if patientPhoneNoToSearch:
                 query |= Q(patientPhoneNo__iexact=patientPhoneNoToSearch)
+            if request.POST.get('patientAadharNumber'):
+                aadhaar = request.POST.get('patientAadharNumber').upper()
+                query |= Q(patientAadharNumber__iexact=aadhaar)
             if not query:
                 messages.info(request, "Enter one of the fields")
                 return redirect('patient_details')
@@ -250,6 +253,7 @@ def patient_details(request):
                 return render(request, 'pharmacyapp/patient_details.html', {'form': form})
             patientDetail = form.save(commit=False)
             patientDetail.patientID = f"AMC-{uuid4().hex[:8].upper()}"
+            patientDetail.patientAadharNumber = patientDetail.patientAadharNumber.upper()
             patientDetail.save()
             return redirect('bill_details', pk=patientDetail.pk)
             #####MAKE THE BILL FORM IN 2 FRAMES
@@ -265,44 +269,84 @@ def patient_details(request):
         form = PatientForm()
     return render(request, 'pharmacyapp/patient_details.html', {'form': form})
 
+@login_required
 def patient_queue(request):
-    form = PatientQueueForm(request.POST or None)
-    if request.method == 'POST' and form.is_valid():
-        patient = form.cleaned_data['patient']
-        
-        # Check if the patient is already in queue and not yet served
-        already_in_queue = PatientQueueEntry.objects.filter(patient=patient, is_served=False).exists()
-        
-        if already_in_queue:
-            messages.warning(request, f"{patient.patientName} is already in the queue.")
-        else:
-            PatientQueueEntry.objects.create(patient=patient)
-            messages.success(request, f"{patient.patientName} added to queue.")
-        
-        return redirect('patient_queue')
+    existing_patients = None
 
-    queue = PatientQueueEntry.objects.filter(is_served=False)
+    if request.method == 'POST':
+        form = PatientForm(request.POST)
+        if form.is_valid():
+            queue_type = form.cleaned_data.get('queue_type', 'current')
+
+            patient = form.save(commit=False)
+            patient.patientAadharNumber = patient.patientAadharNumber.upper()
+            patient.patientID = f"AMC-{uuid4().hex[:8].upper()}"
+            patient.save()
+
+            PatientQueueEntry.objects.create(patient=patient, queue_type=queue_type)
+            messages.success(request, f"New patient '{patient.patientName}' registered and added to {queue_type} queue.")
+            return redirect('patient_queue')
+
+        else:
+            if 'patientAadharNumber' in form.errors:
+                aadhar = request.POST.get('patientAadharNumber').upper()
+                existing_patients = PatientDetail.objects.filter(patientAadharNumber=aadhar)
+                messages.info(request, "Patient(s) with this Aadhaar number exist. Please select below or register new.")
+
+    else:
+        form = PatientForm()
+
+    current_queue = PatientQueueEntry.objects.filter(is_served=False, queue_type='current')
+    followup_queue = PatientQueueEntry.objects.filter(is_served=False, queue_type='followup')
     served = PatientQueueEntry.objects.filter(is_served=True)
 
-    context = {
+    return render(request, 'pharmacyapp/patient_queue.html', {
         'form': form,
-        'queue': queue,
+        'queue': current_queue,
+        'followup_queue': followup_queue,
         'served': served,
-    }
-    return render(request, 'pharmacyapp/patient_queue.html', context)
+        'existing_patients': existing_patients,
+    })
 
 
+@login_required
+def add_patient_to_queue(request):
+    if request.method == 'POST':
+        patient_id = request.POST.get('patient_id')
+        queue_type_key = f'queue_type_{patient_id}'
+        queue_type = request.POST.get(queue_type_key, 'current')  # default to current
+
+        try:
+            patient = PatientDetail.objects.get(id=patient_id)
+        except PatientDetail.DoesNotExist:
+            messages.error(request, "Selected patient does not exist.")
+            return redirect('patient_queue')
+
+        already_in_queue = PatientQueueEntry.objects.filter(patient=patient, is_served=False, queue_type=queue_type).exists()
+        if already_in_queue:
+            messages.warning(request, f"{patient.patientName} is already in the {queue_type} queue.")
+        else:
+            PatientQueueEntry.objects.create(patient=patient, queue_type=queue_type)
+            messages.success(request, f"{patient.patientName} added to the {queue_type} queue.")
+
+    return redirect('patient_queue')
+
+
+
+@login_required    
 def serve_patient(request, entry_id):
     entry = get_object_or_404(PatientQueueEntry, id=entry_id)
     entry.mark_served()
     messages.success(request, f"{entry.patient.patientName} has been marked as served.")
     return redirect('patient_queue')
 
+@login_required    
 def clear_served_patients(request):
     if request.method == 'POST':
         PatientQueueEntry.objects.filter(is_served=True).delete()
-    return redirect('patient_queue')  # update with your queue view name
-    
+        messages.success(request, "Cleared all served patients.")
+    return redirect('patient_queue')
+
 @login_required    
 def bill_details(request, pk):
     record = get_object_or_404(PatientDetail, pk=pk)
