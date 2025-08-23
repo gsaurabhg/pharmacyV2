@@ -1,4 +1,3 @@
-from django.urls import re_path as url
 from django.urls import path
 from pharmacyapp.views import (
     inventory_views,
@@ -6,7 +5,7 @@ from pharmacyapp.views import (
     procurement_views,
     billing_views,
     reports_views,
-    utilities  # replaced misc_views with utilities
+    utilities
 )
 
 urlpatterns = [
@@ -26,12 +25,16 @@ urlpatterns = [
     # Procurement
     path('procurement/form/', procurement_views.procurement_form, name='procurement_form'),
 
-    # Patients and Billing
-    path('patient/details/', patient_views.patient_details, name='patient_details'),
-    path('patient/details/<int:pk>/', billing_views.bill_details, name='bill_details'),
-    path('patient/details/<int:pk>/order/', billing_views.medicine_order, name='medicine_order'),
-    path('patient/details/<int:pk>/checkout/', billing_views.medicine_checkout, name='medicine_checkout'),
-    path('patient/details/<int:pk>/Previouscheckout/', billing_views.medicine_last_checkout, name='medicine_last_checkout'),
+    # Unified Patient Dashboard
+    path('patient/dashboard/', patient_views.patient_dashboard, name='patient_dashboard'),
+    path('queue/view-only/', patient_views.queue_view_only, name='queue_view_only'),
+    path('patient/register-from-search/', patient_views.register_patient_from_search, name='register_patient_from_search'),
+    
+    # Billing (per patient)
+    path('patient/<int:pk>/bill/', billing_views.bill_details, name='bill_details'),
+    path('patient/<int:pk>/order/', billing_views.medicine_order, name='medicine_order'),
+    path('patient/<int:pk>/checkout/', billing_views.medicine_checkout, name='medicine_checkout'),
+    path('patient/<int:pk>/previouscheckout/', billing_views.medicine_last_checkout, name='medicine_last_checkout'),
     path('final-bill/<str:bill_no>/', billing_views.final_bill_view, name='final_bill_view'),
 
     # Reports
@@ -39,16 +42,18 @@ urlpatterns = [
     path('post/report/returns/', reports_views.report_returns, name='report_returns'),
     path('post/report/purchases/', reports_views.report_purchases, name='report_purchases'),
 
-    # Utilities: DB Dump, Email, Load, etc.
+    # Utilities
     path('dump-database/', utilities.dump_database_view, name='dump_database'),
     path('send-email/', utilities.send_email_view, name='send_email'),
     path('load-data/', utilities.load_data_view, name='load_data'),
 
-
-    # Patient Queue
-    path('queue/', patient_views.patient_queue, name='patient_queue'),
+    # Queue Management (now tied to dashboard, but URLs still used by forms/buttons)
     path('queue/add/', patient_views.add_patient_to_queue, name='add_patient_to_queue'),
     path('queue/serve/<int:entry_id>/', patient_views.serve_patient, name='serve_patient'),
     path('queue/clear-served/', patient_views.clear_served_patients, name='clear_served_patients'),
     path('swap-queue/<int:entry_id>/', patient_views.swap_patient_queue, name='swap_patient_queue'),
+
+    # Optional legacy (if not using anymore, safe to remove)
+    # path('patient/details/', patient_views.patient_details, name='patient_details'),
+    # path('queue/', patient_views.patient_queue, name='patient_queue'),  # Legacy
 ]

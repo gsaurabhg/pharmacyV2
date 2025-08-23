@@ -1,0 +1,169 @@
+{% extends 'pharmacyapp/base.html' %}
+{% load static %}
+
+{% block body_block %}
+<div class="row">
+  <!-- Left Column: Search or Register -->
+  <div class="col-md-6">
+    <h3>Search or Register Patient</h3>
+    <form method="POST" novalidate>
+      {% csrf_token %}
+      <div class="mb-3">
+        {{ form.patientName.label_tag }}
+        {{ form.patientName }}
+        {% if form.patientName.errors %}
+          <div class="text-danger">{{ form.patientName.errors }}</div>
+        {% endif %}
+      </div>
+      <div class="mb-3">
+        {{ form.patientPhoneNo.label_tag }}
+        {{ form.patientPhoneNo }}
+        {% if form.patientPhoneNo.errors %}
+          <div class="text-danger">{{ form.patientPhoneNo.errors }}</div>
+        {% endif %}
+      </div>
+      <div class="mb-3">
+        {{ form.patientAadharNumber.label_tag }}
+        {{ form.patientAadharNumber }}
+        {% if form.patientAadharNumber.errors %}
+          <div class="text-danger">{{ form.patientAadharNumber.errors }}</div>
+        {% endif %}
+      </div>
+
+      <!-- Search button shown always -->
+      <button type="submit" name="search" value="search" class="btn btn-info">Search</button>
+    </form>
+
+    {% if messages %}
+      <ul class="messages mt-3">
+        {% for message in messages %}
+          <li class="{{ message.tags }}">{{ message }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+    <!-- Existing patients search results -->
+    {% if found_patients and found_patients.exists %}
+      <hr>
+      <h4>Matching Patients:</h4>
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Name</th><th>Phone</th><th>Aadhaar</th><th>Queue</th><th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for patient in found_patients %}
+          <tr>
+            <td>{{ patient.patientName }}</td>
+            <td>{{ patient.patientPhoneNo }}</td>
+            <td>{{ patient.patientAadharNumber }}</td>
+            <td>
+              <form method="post" action="{% url 'add_patient_to_queue' %}">
+                {% csrf_token %}
+                <input type="hidden" name="patient_id" value="{{ patient.id }}">
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="queue_type_{{ patient.id }}" value="current" checked>
+                  <label class="form-check-label">Current</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="queue_type_{{ patient.id }}" value="followup">
+                  <label class="form-check-label">Follow Up</label>
+                </div>
+            </td>
+            <td>
+                <button type="submit" class="btn btn-primary btn-sm">Add to Queue</button>
+              </form>
+              <a href="{% url 'bill_details' patient.pk %}" class="btn btn-success btn-sm mt-1 text-white">Generate Bill</a>
+              <a href="{% url 'medicine_last_checkout' patient.pk %}" class="btn btn-secondary btn-sm mt-1 text-white">Return</a>
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    {% endif %}
+
+    <!-- Registration section shown only if flagged -->
+    {% if show_register_section %}
+      <hr>
+      <h4>New Patient Not Found</h4>
+      <p>Please fill Aadhaar Number to register the patient.</p>
+      <form method="POST" novalidate>
+        {% csrf_token %}
+        <!-- Pass entered data as hidden inputs so they persist -->
+        <input type="hidden" name="patientName" value="{{ form.data.patientName|default:'' }}">
+        <input type="hidden" name="patientPhoneNo" value="{{ form.data.patientPhoneNo|default:'' }}">
+        <input type="hidden" name="patientAadharNumber" value="{{ form.data.patientAadharNumber|default:'' }}">
+
+        <label>Add to Queue:</label>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="queue_type" id="queue_current" value="current" checked>
+          <label class="form-check-label" for="queue_current">Current</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="queue_type" id="queue_none" value="none">
+          <label class="form-check-label" for="queue_none">Do not add to queue</label>
+        </div>
+
+        <!-- Show validation errors for Aadhaar explicitly here -->
+        {% if form.patientAadharNumber.errors %}
+          <div class="text-danger mt-2">{{ form.patientAadharNumber.errors }}</div>
+        {% endif %}
+
+        <button type="submit" name="newReg" value="newReg" class="btn btn-success mt-2">Register Patient</button>
+      </form>
+    {% endif %}
+  </div>
+
+  <!-- Right Column: Queues -->
+  <div class="col-md-6">
+    <h4>Current Queue</h4>
+    <ul class="list-group mb-3">
+      {% for entry in current_queue %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          {{ forloop.counter }}. {{ entry.patient.patientName }}
+          (Queued at {{ entry.queued_at|date:"SHORT_DATETIME_FORMAT" }})
+          <span>
+            <a href="{% url 'swap_patient_queue' entry.id %}" class="btn btn-warning btn-sm">Swap → Follow Up</a>
+            <a href="{% url 'serve_patient' entry.id %}" class="btn btn-success btn-sm text-white">Mark Served</a>
+          </span>
+        </li>
+      {% empty %}
+        <li class="list-group-item">No patients in current queue.</li>
+      {% endfor %}
+    </ul>
+
+    <h4>Follow Up Queue</h4>
+    <ul class="list-group mb-3">
+      {% for entry in followup_queue %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          {{ forloop.counter }}. {{ entry.patient.patientName }}
+          (Queued at {{ entry.queued_at|date:"SHORT_DATETIME_FORMAT" }})
+          <span>
+            <a href="{% url 'swap_patient_queue' entry.id %}" class="btn btn-warning btn-sm">Swap → Current</a>
+            <a href="{% url 'serve_patient' entry.id %}" class="btn btn-success btn-sm text-white">Mark Served</a>
+          </span>
+        </li>
+      {% empty %}
+        <li class="list-group-item">No patients in follow up queue.</li>
+      {% endfor %}
+    </ul>
+
+    <form method="POST" action="{% url 'clear_served_patients' %}">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger mb-2">Clear Served Patients</button>
+    </form>
+
+    <h4>Served Patients</h4>
+    <ul class="list-group">
+      {% for entry in served %}
+        <li class="list-group-item">
+          {{ entry.patient.patientName }} – {{ entry.served_at|date:"SHORT_DATETIME_FORMAT" }}
+        </li>
+      {% empty %}
+        <li class="list-group-item">No served patients yet.</li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+{% endblock %}

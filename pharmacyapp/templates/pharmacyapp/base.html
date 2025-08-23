@@ -1,156 +1,156 @@
 {% load static %}
 
 <html>
-    <head>
-        <title>Shree Sai Drug Shop</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<head>
+    <title>Shree Sai Drug Shop</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        <!-- Use latest Bootstrap CSS from CDN -->
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/pharmacyapp.css' %}">
+    <link rel="icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
+    <link href="{% static 'css/all.min.css' %}" rel="stylesheet">
 
-        <!-- Use latest DataTables CSS from CDN -->
-        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" crossorigin="anonymous"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+    <!-- DataTables JS -->
+    <script type="text/javascript" src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
 
-        <!-- Custom Styles (Override Bootstrap or Custom styles if any) -->
-        <link rel="stylesheet" href="{% static 'css/pharmacyapp.css' %}">
-        <link rel="icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
-        <link href="{% static 'css/all.min.css' %}" rel="stylesheet">
-
-        <!-- Use latest version of jQuery from CDN -->
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js" crossorigin="anonymous"></script>
-
-        <!-- Use latest Bootstrap JS from CDN -->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
-
-        <!-- Use latest version of DataTables JS from CDN -->
-        <script type="text/javascript" src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
-
-        <!-- Custom script to handle the dropdown and menu behavior -->
-        <script type="text/javascript">
-            $(document).ready(function() {
-                // Initialize Bootstrap dropdowns (optional for dropdowns)
-                var dropdowns = document.querySelectorAll('.dropdown-toggle');
-                dropdowns.forEach(function(dropdown) {
-                    new bootstrap.Dropdown(dropdown);
-                });
-
-                // Prevent default behavior of href="#" to avoid scrolling
-                $('a[href="#"]').on('click', function (e) {
-                    e.preventDefault();
-                });
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var dropdowns = document.querySelectorAll('.dropdown-toggle');
+            dropdowns.forEach(function (dropdown) {
+                new bootstrap.Dropdown(dropdown);
             });
-        </script>
-    </head>
 
-    <body>
-        <div class="navbar navbar-expand-lg navbar-fixed-top navbar-grey"> <!-- Added 'navbar-grey' class here -->
-            <div class="container">
-                <a class="navbar-brand" href="/">Shree Sai Drug Shop</a>
-                <!-- Ensure the navbar is collapsible on small screens -->
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
+            $('a[href="#"]').on('click', function (e) {
+                e.preventDefault();
+            });
+        });
 
-                <!-- The navbar menu will collapse on smaller screens and expand on larger screens -->
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav mr-auto">
+        function handleMenuClick(e) {
+            e.preventDefault();
+            const filename = prompt("Enter filename for DB export:");
+            if (filename) {
+                document.getElementById('filename').value = filename;
+                document.getElementById('dumpForm').submit();
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <div class="navbar navbar-expand-lg navbar-fixed-top navbar-grey">
+        <div class="container">
+            <a class="navbar-brand" href="/">Shree Sai Drug Shop</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+
+                    {% if user.is_authenticated %}
                         <li class="nav-item">
-                            <a class="nav-link" href="/">Home</a>
+                            <a class="nav-link" href="{% url 'inventory_list' %}">Inventory</a>
                         </li>
-                        {% if user.is_authenticated %}
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'inventory_list' %}">Inventory</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'patient_details' %}">Bill</a>
-                            </li>
-							<li class="nav-item">
-								<a class="nav-link" href="{% url 'patient_queue' %}">Patient Queue</a>
-        					</li>
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" id="navbarDropdownReport" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    Report <span class="caret"></span>
-                                </a>
-                                <div class="dropdown-menu" aria-labelledby="navbarDropdownReport">
-                                    <a class="dropdown-item" href="{% url 'report_sales' %}">Sales</a>
-                                    <a class="dropdown-item" href="{% url 'report_purchases' %}">Purchases</a>
-                                    <a class="dropdown-item" href="{% url 'report_returns' %}">Returns</a>
-                                </div>
-                            </li>
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" id="navbarDropdownAdmin" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    Admin <span class="caret"></span>
-                                </a>
-                                <div class="dropdown-menu" aria-labelledby="navbarDropdownAdmin">
-                                    <a class="dropdown-item" href="#" onclick="handleMenuClick(event)">Export Database</a>
-                                    <a class="dropdown-item" href="{% url 'load_data' %}">Load Database</a>
-                                </div>
-                            </li>
-                        {% endif %}
-                    </ul>
-                    <ul class="navbar-nav ml-auto">
-                        {% if user.is_authenticated %}
-                            <li class="nav-item">
-                                <span class="navbar-text">Hello, {{ user.username }}!</span>
-                            </li>
-                            <li class="nav-item">
-								<form method="POST" action="{% url 'logout' %}">
-									{% csrf_token %}
-									<button type="submit">Log out</button>
-								</form>
-							</li>
-                        {% else %}
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'login' %}">Log In</a>
-                            </li>
-                            <li class="nav-item">
-                                <span class="navbar-text">Hello Guest</span>
-                            </li>
-                        {% endif %}
-                    </ul>
-                </div>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'patient_dashboard' %}">Patient Dashboard</a>
+                        </li>
+						<li class="nav-item">
+						    <a class="nav-link" href="{% url 'queue_view_only' %}">Appointment Queue</a>
+						</li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" id="navbarDropdownReport" role="button" data-bs-toggle="dropdown">
+                                Report <span class="caret"></span>
+                            </a>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" href="{% url 'report_sales' %}">Sales</a>
+                                <a class="dropdown-item" href="{% url 'report_purchases' %}">Purchases</a>
+                                <a class="dropdown-item" href="{% url 'report_returns' %}">Returns</a>
+                            </div>
+                        </li>
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" id="navbarDropdownAdmin" role="button" data-bs-toggle="dropdown">
+                                Admin <span class="caret"></span>
+                            </a>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" href="#" onclick="handleMenuClick(event)">Export Database</a>
+                                <a class="dropdown-item" href="{% url 'load_data' %}">Load Database</a>
+                            </div>
+                        </li>
+                    {% endif %}
+                </ul>
+
+                <ul class="navbar-nav ms-auto">
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <span class="navbar-text">Hello, {{ user.username }}!</span>
+                        </li>
+                        <li class="nav-item">
+                            <form method="POST" action="{% url 'logout' %}" class="d-inline">
+                                {% csrf_token %}
+                                <button class="btn btn-sm btn-outline-secondary" type="submit">Log out</button>
+                            </form>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'login' %}">Log In</a>
+                        </li>
+                        <li class="nav-item">
+                            <span class="navbar-text">Hello Guest</span>
+                        </li>
+                    {% endif %}
+                </ul>
             </div>
         </div>
+    </div>
 
-        <div class="content container">
-            <div class="row">
-                <div class="col-md-8">
-                    {% block content %}
-                    {% endblock %}
-                </div>
+    <div class="content container mt-4">
+        <div class="row">
+            <div class="col-md-8">
+                {% block content %}
+                {% endblock %}
             </div>
         </div>
+    </div>
 
-        <div class="container-fluid">
-            <div class="row-fluid">
-                <div class="span3">
-                    <div class="well sidebar-nav">
-                        <div id="cats">
-                            {% block sidenav_block %}
-                            {% endblock %}
-                        </div>
-                    </div>
-                </div>
-                <div class="span9">
-                    {% block body_block %}
-                    {% endblock %}
-                </div>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-3">
+                {% block sidenav_block %}
+                {% endblock %}
+            </div>
+            <div class="col-md-9">
+                {% block body_block %}
+                {% endblock %}
             </div>
         </div>
+    </div>
 
-		<form id="dumpForm" method="post" action="{% url 'dump_database' %}" style="display: none;">
-			{% csrf_token %}
-			<input type="text" id="filename" name="filename" required>
-		</form>
+    <form id="dumpForm" method="post" action="{% url 'dump_database' %}" style="display: none;">
+        {% csrf_token %}
+        <input type="text" id="filename" name="filename" required>
+    </form>
 
-        <footer>
-            <div class="container">
-                <p>&copy; SauraBhoomija</p>
-            </div>
-        </footer>
+    <footer class="text-center mt-4 mb-3">
+        <div class="container">
+            <p>&copy; SauraBhoomija</p>
+        </div>
+    </footer>
 
-        <script>var timestamp = new Date().getTime();</script>
-        <script type="text/javascript" src="{% static 'js/jscript-queries.js' %}?v={{ timestamp }}"></script>
-
-    </body>
+    <script>
+        var timestamp = new Date().getTime();
+    </script>
+    <script type="text/javascript" src="{% static 'js/jscript-queries.js' %}?v={{ timestamp }}"></script>
+</body>
 </html>
