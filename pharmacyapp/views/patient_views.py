@@ -21,14 +21,14 @@ def patient_details(request):
         if request.POST.get('search'):
             query = Q()
             if patientNameToSearch:
-                query |= Q(patientName__icontains=patientNameToSearch)
+                query |= Q(patientName__iexact=patientNameToSearch)
             if patientIDToSearch:
                 query |= Q(patientID__iexact=patientIDToSearch)
             if patientPhoneNoToSearch:
-                query |= Q(patientPhoneNo__iexact=patientPhoneNoToSearch)
+                query |= Q(patientPhoneNo=patientPhoneNoToSearch)
             if request.POST.get('patientAadharNumber'):
                 aadhaar = request.POST.get('patientAadharNumber').upper()
-                query |= Q(patientAadharNumber__iexact=aadhaar)
+                query |= Q(patientAadharNumber__exact=aadhaar)
 
             if not query:
                 messages.info(request, "Enter at least one field to search.")
@@ -44,8 +44,8 @@ def patient_details(request):
                 return render(request, 'pharmacyapp/patient_details.html', {'form': form})
 
             existingRecordFound = PatientDetail.objects.filter(
-                patientName__icontains=patientNameToSearch,
-                patientPhoneNo__exact=patientPhoneNoToSearch
+                patientName__exact=patientNameToSearch,
+                patientAadharNumber__exact=aadhaar
             )
             if existingRecordFound:
                 messages.info(request, "Patient already exists. Click Search.")
@@ -98,8 +98,8 @@ def patient_queue(request):
     else:
         form = PatientForm()
 
-    current_queue = PatientQueueEntry.objects.filter(is_served=False, queue_type='current')
-    followup_queue = PatientQueueEntry.objects.filter(is_served=False, queue_type='followup')
+    current_queue = PatientQueueEntry.objects.filter(is_served=False, queue_type='current').order_by('queued_at')
+    followup_queue = PatientQueueEntry.objects.filter(is_served=False, queue_type='followup').order_by('queued_at')
     served = PatientQueueEntry.objects.filter(is_served=True)
 
     return render(request, 'pharmacyapp/patient_queue.html', {
@@ -150,4 +150,17 @@ def clear_served_patients(request):
     if request.method == 'POST':
         PatientQueueEntry.objects.filter(is_served=True).delete()
         messages.success(request, "Cleared all served patients.")
+    return redirect('patient_queue')
+
+@login_required
+def swap_patient_queue(request, entry_id):
+    entry = get_object_or_404(PatientQueueEntry, id=entry_id, is_served=False)
+
+    if entry.queue_type == 'current':
+        entry.queue_type = 'followup'
+    else:
+        entry.queue_type = 'current'
+
+    entry.save()
+    messages.success(request, f"{entry.patient.patientName} moved to {entry.queue_type} queue.")
     return redirect('patient_queue')

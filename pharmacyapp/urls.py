@@ -50,4 +50,5 @@ urlpatterns = [
     path('queue/add/', patient_views.add_patient_to_queue, name='add_patient_to_queue'),
     path('queue/serve/<int:entry_id>/', patient_views.serve_patient, name='serve_patient'),
     path('queue/clear-served/', patient_views.clear_served_patients, name='clear_served_patients'),
+    path('swap-queue/<int:entry_id>/', patient_views.swap_patient_queue, name='swap_patient_queue'),
 ]

@@ -5,23 +5,35 @@
 <div class="row">
   <div class="col-md-6">
     <h3>Register Patient & Add to Queue</h3>
-    <form method="POST">
-      {% csrf_token %}
-      <div class="mb-3">
-        {{ form.patientName.label_tag }} {{ form.patientName }}
-      </div>
-      <div class="mb-3">
-        {{ form.patientPhoneNo.label_tag }} {{ form.patientPhoneNo }}
-      </div>
-      <div class="mb-3">
-        {{ form.patientAadharNumber.label_tag }} {{ form.patientAadharNumber }}
-      </div>
-      <div class="mb-3">
-        {{ form.queue_type.label_tag }}
-        {{ form.queue_type }}
-      </div>
-      <button type="submit" class="btn btn-primary">Register & Queue</button>
-    </form>
+	<form method="POST">
+	  {% csrf_token %}
+	  <div class="mb-3">
+		{{ form.patientName.label_tag }} {{ form.patientName }}
+	  </div>
+	  <div class="mb-3">
+		{{ form.patientPhoneNo.label_tag }} {{ form.patientPhoneNo }}
+	  </div>
+	  <div class="mb-3">
+		{{ form.patientAadharNumber.label_tag }} {{ form.patientAadharNumber }}
+	  </div>
+
+	  <div class="mb-3">
+		{{ form.queue_type.label_tag }}
+		{% if existing_patients %}
+		  <!-- Disable radio buttons -->
+		  {% for radio in form.queue_type %}
+			<label class="form-check-label text-muted">{{ radio.choice_label }}</label>
+		  {% endfor %}
+		{% else %}
+		  {{ form.queue_type }}
+		{% endif %}
+	  </div>
+
+	  <button type="submit" class="btn btn-primary" id="register-btn"
+		{% if existing_patients %}disabled{% endif %}>
+		Register & Queue
+	  </button>
+	</form>
 
     {% if existing_patients %}
       <hr>
@@ -38,28 +50,28 @@
         </thead>
         <tbody>
           {% for patient in existing_patients %}
-          <tr>
-            <td>{{ patient.patientName }}</td>
-            <td>{{ patient.patientPhoneNo }}</td>
-            <td>{{ patient.patientAadharNumber }}</td>
-            <td>
-              <form method="post" action="{% url 'add_patient_to_queue' %}">
-                {% csrf_token %}
-                <input type="hidden" name="patient_id" value="{{ patient.id }}">
-                <div class="form-check form-check-inline">
-                  <input class="form-check-input" type="radio" name="queue_type_{{ patient.id }}" id="current_{{ patient.id }}" value="current" checked>
-                  <label class="form-check-label" for="current_{{ patient.id }}">Current</label>
-                </div>
-                <div class="form-check form-check-inline">
-                  <input class="form-check-input" type="radio" name="queue_type_{{ patient.id }}" id="followup_{{ patient.id }}" value="followup">
-                  <label class="form-check-label" for="followup_{{ patient.id }}">Follow Up</label>
-                </div>
-            </td>
-            <td>
-                <button type="submit" class="btn btn-primary btn-sm">Add</button>
-              </form>
-            </td>
-          </tr>
+		  <form method="post" action="{% url 'add_patient_to_queue' %}">
+			{% csrf_token %}
+            <input type="hidden" name="patient_id" value="{{ patient.id }}">
+	        <tr>
+				<td>{{ patient.patientName }}</td>
+				<td>{{ patient.patientPhoneNo }}</td>
+				<td>{{ patient.patientAadharNumber }}</td>
+				<td>
+					<div class="form-check form-check-inline">
+					  <input class="form-check-input" type="radio" name="queue_type_{{ patient.id }}" id="current_{{ patient.id }}" value="current" checked>
+					  <label class="form-check-label" for="current_{{ patient.id }}">Current</label>
+					</div>
+					<div class="form-check form-check-inline">
+					  <input class="form-check-input" type="radio" name="queue_type_{{ patient.id }}" id="followup_{{ patient.id }}" value="followup">
+					  <label class="form-check-label" for="followup_{{ patient.id }}">Follow Up</label>
+					</div>
+				</td>
+				<td>
+					<button type="submit" class="btn btn-primary btn-sm">Add</button>
+				</td>
+	        </tr>
+		  </form>
           {% endfor %}
         </tbody>
       </table>
@@ -76,14 +88,15 @@
   </div>
 
   <div class="col-md-6">
-    <h3>Current Patient Queue</h3>
+    <h3>Current Patient Queue ({{ queue|length }})</h3>
 
     {% if queue %}
       <ul class="list-group mb-4">
         {% for entry in queue %}
           <li class="list-group-item d-flex justify-content-between align-items-center">
             {{ forloop.counter }}. {{ entry.patient.patientName }} (Queued at {{ entry.queued_at|date:"SHORT_DATETIME_FORMAT" }})
-            <a href="{% url 'serve_patient' entry.id %}" class="btn btn-warning btn-sm">Mark Served</a>
+            <a href="{% url 'serve_patient' entry.id %}" class="btn btn-warning btn-sm me-2">Mark Served</a>
+			<a href="{% url 'swap_patient_queue' entry.id %}" class="btn btn-secondary btn-sm">Move to Follow-Up</a>
           </li>
         {% endfor %}
       </ul>
@@ -91,13 +104,14 @@
       <p>No patients are waiting in current queue.</p>
     {% endif %}
 
-    <h3>Follow Up Queue</h3>
+	<h3>Follow Up Queue ({{ followup_queue|length }})</h3>
     {% if followup_queue %}
       <ul class="list-group mb-4">
         {% for entry in followup_queue %}
           <li class="list-group-item d-flex justify-content-between align-items-center">
             {{ forloop.counter }}. {{ entry.patient.patientName }} (Queued at {{ entry.queued_at|date:"SHORT_DATETIME_FORMAT" }})
-            <a href="{% url 'serve_patient' entry.id %}" class="btn btn-warning btn-sm">Mark Served</a>
+            <a href="{% url 'serve_patient' entry.id %}" class="btn btn-warning btn-sm me-2">Mark Served</a>
+			<a href="{% url 'swap_patient_queue' entry.id %}" class="btn btn-secondary btn-sm">Move to Current</a>
           </li>
         {% endfor %}
       </ul>
@@ -124,3 +138,19 @@
   </div>
 </div>
 {% endblock %}
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const form = document.querySelector("form");
+  const button = document.querySelector("#register-btn");
+
+  if (form && button) {
+    form.addEventListener("submit", function () {
+      if (!button.disabled) {
+        button.disabled = true;
+        button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Registering...';
+      }
+    });
+  }
+});
+</script>
