@@ -9,7 +9,6 @@ from pharmacyapp.models import PatientDetail, PatientQueueEntry
 
 
 @login_required
-@login_required
 def patient_dashboard(request):
     found_patients = None
     show_register_section = False
