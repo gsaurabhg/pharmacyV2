@@ -124,7 +124,7 @@
           {{ forloop.counter }}. {{ entry.patient.patientName }}
           (Queued at {{ entry.queued_at|date:"SHORT_DATETIME_FORMAT" }})
           <span>
-            <a href="{% url 'swap_patient_queue' entry.id %}" class="btn btn-warning btn-sm">Swap → Follow Up</a>
+            <a href="{% url 'swap_patient_queue' entry.id %}" class="btn btn-warning btn-sm">Swap → Down</a>
             <a href="{% url 'serve_patient' entry.id %}" class="btn btn-success btn-sm text-white">Mark Served</a>
           </span>
         </li>
@@ -140,7 +140,7 @@
           {{ forloop.counter }}. {{ entry.patient.patientName }}
           (Queued at {{ entry.queued_at|date:"SHORT_DATETIME_FORMAT" }})
           <span>
-            <a href="{% url 'swap_patient_queue' entry.id %}" class="btn btn-warning btn-sm">Swap → Current</a>
+            <a href="{% url 'swap_patient_queue' entry.id %}" class="btn btn-warning btn-sm">Swap → Up</a>
             <a href="{% url 'serve_patient' entry.id %}" class="btn btn-success btn-sm text-white">Mark Served</a>
           </span>
         </li>
