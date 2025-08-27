@@ -49,7 +49,7 @@
       <table class="table table-bordered">
         <thead>
           <tr>
-            <th>Name</th><th>Phone</th><th>Aadhaar</th><th>Queue</th><th>Actions</th>
+            <th>Name</th><th>Phone</th><th>Aadhaar</th><th>Queue</th><th>Billing</th>
           </tr>
         </thead>
         <tbody>
@@ -70,10 +70,11 @@
                   <input class="form-check-input" type="radio" name="queue_type_{{ patient.id }}" value="followup">
                   <label class="form-check-label">Follow Up</label>
                 </div>
-            </td>
-            <td>
                 <button type="submit" class="btn btn-primary btn-sm">Add to Queue</button>
               </form>
+
+            </td>
+            <td>
               <a href="{% url 'bill_details' patient.pk %}" class="btn btn-success btn-sm mt-1 text-white">Order Medicines</a>
               <a href="{% url 'medicine_last_checkout' patient.pk %}" class="btn btn-secondary btn-sm mt-1 text-white">Last Bill</a>
               <button type="button" class="btn btn-warning btn-sm mt-1 text-white"
