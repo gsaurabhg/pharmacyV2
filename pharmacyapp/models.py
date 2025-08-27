@@ -151,26 +151,34 @@ class Sale(models.Model):
         return f"Sale of {self.medicine.medicineName} - {self.noOfTabletsSold} tablets"
 
 class PatientDetail(models.Model):
-    patientID = models.CharField("Patient ID",max_length=50, blank=True)
-    patientName = models.CharField("Name",max_length=50, blank=True)
-    patientPhoneNo = models.PositiveSmallIntegerField("Phone Number", blank=True, default = '0')
-    # Aadhaar: must be exactly 12 digits
-    patientAadharNumber = models.CharField(
-        "Aadhaar Number",
-        max_length=12,
-        validators=[RegexValidator(regex=r'^\d{12}$', message='Aadhaar must be exactly 12 digits')],
-        unique=True,
-        blank=False,
-        null=False
+    patientID = models.CharField("Patient ID", max_length=50, blank=True)
+    patientName = models.CharField("Name", max_length=50, blank=True)
+
+    countryCode = models.CharField(
+        "Country Code",
+        max_length=5,
+        validators=[
+            RegexValidator(
+                regex=r'^\+\d{1,4}$',
+                message="Country code must start with '+' followed by 1 to 4 digits."
+            )
+        ],
+        default='+91'  # or any default country code
     )
 
-    def save(self, *args, **kwargs):
-        if self.patientAadharNumber:
-            self.patientAadharNumber = self.patientAadharNumber.upper()  # ensure uppercase
-        super().save(*args, **kwargs)
+    patientPhoneNo = models.CharField(
+        "Phone Number",
+        max_length=10,
+        validators=[
+            RegexValidator(
+                regex=r'^\d{10}$',
+                message="Phone number must be exactly 10 digits and only contain numbers."
+            )
+        ]
+    )
 
     def __str__(self):
-        return self.patientID
+        return f"{self.patientID} - {self.patientName}"
 
 #
 #Fields:

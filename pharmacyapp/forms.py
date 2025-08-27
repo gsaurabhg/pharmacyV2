@@ -20,13 +20,12 @@ class CombinedForm(forms.ModelForm):
 class PatientForm(forms.ModelForm):
     class Meta:
         model = PatientDetail
-        fields = ['patientName', 'patientPhoneNo', 'patientAadharNumber']
+        fields = ['patientName', 'countryCode','patientPhoneNo']
 
     def __init__(self, *args, **kwargs):
         self.is_registering = kwargs.pop('is_registering', False)
         super().__init__(*args, **kwargs)
         if self.is_registering:
-            self.fields['patientAadharNumber'].required = True
             self.fields['patientName'].required = True
             self.fields['patientPhoneNo'].required = True
         else:
@@ -34,19 +33,10 @@ class PatientForm(forms.ModelForm):
             for field in self.fields.values():
                 field.required = False
 
-    def clean_patientAadharNumber(self):
-        aadhar = self.cleaned_data.get('patientAadharNumber', '').strip().upper()
-        if self.is_registering:
-            if not aadhar:
-                raise forms.ValidationError("Aadhaar Number is required for new registration.")
-            if PatientDetail.objects.filter(patientAadharNumber=aadhar).exists():
-                raise forms.ValidationError("Patient detail with this Aadhaar Number already exists.")
-        return aadhar
-
     def clean(self):
         cleaned_data = super().clean()
         if not self.is_registering:
-            if not (cleaned_data.get('patientName') or cleaned_data.get('patientPhoneNo') or cleaned_data.get('patientAadharNumber')):
+            if not (cleaned_data.get('patientName') or cleaned_data.get('patientPhoneNo')):
                 raise forms.ValidationError("Please enter at least one field to search.")
         return cleaned_data
 

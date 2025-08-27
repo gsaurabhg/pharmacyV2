@@ -15,6 +15,13 @@
           <div class="text-danger">{{ form.patientName.errors }}</div>
         {% endif %}
       </div>
+	  <div class="mb-3">
+	    {{ form.countryCode.label_tag }}
+	    {{ form.countryCode }}
+	    {% if form.countryCode.errors %}
+	      <div class="text-danger">{{ form.countryCode.errors }}</div>
+	    {% endif %}
+	  </div>
       <div class="mb-3">
         {{ form.patientPhoneNo.label_tag }}
         {{ form.patientPhoneNo }}
@@ -49,15 +56,15 @@
       <table class="table table-bordered">
         <thead>
           <tr>
-            <th>Name</th><th>Phone</th><th>Aadhaar</th><th>Queue</th><th>Billing</th>
+            <th>Name</th><th>Country Code</th><th>Phone</th><th>Queue</th><th>Billing</th>
           </tr>
         </thead>
         <tbody>
         {% for patient in found_patients %}
           <tr>
             <td>{{ patient.patientName }}</td>
+            <td>{{ patient.countryCode }}</td>
             <td>{{ patient.patientPhoneNo }}</td>
-            <td>{{ patient.patientAadharNumber }}</td>
             <td>
               <form method="post" action="{% url 'add_patient_to_queue' %}">
                 {% csrf_token %}
@@ -115,11 +122,12 @@
     {% if show_register_section %}
       <hr>
       <h4>New Patient Not Found</h4>
-      <p>Please fill Aadhaar Number to register the patient.</p>
+      <p>Please fill Phone Number to register the patient.</p>
       <form method="POST" novalidate>
         {% csrf_token %}
         <!-- Pass entered data as hidden inputs so they persist -->
         <input type="hidden" name="patientName" value="{{ form.data.patientName|default:'' }}">
+        <input type="hidden" name="countryCode" value="{{ form.data.countryCode|default:'' }}">
         <input type="hidden" name="patientPhoneNo" value="{{ form.data.patientPhoneNo|default:'' }}">
         <input type="hidden" name="patientAadharNumber" value="{{ form.data.patientAadharNumber|default:'' }}">
 
@@ -133,9 +141,9 @@
           <label class="form-check-label" for="queue_none">Do not add to queue</label>
         </div>
 
-        <!-- Show validation errors for Aadhaar explicitly here -->
-        {% if form.patientAadharNumber.errors %}
-          <div class="text-danger mt-2">{{ form.patientAadharNumber.errors }}</div>
+        <!-- Show validation errors for Phone No explicitly here -->
+        {% if form.patientPhoneNo.errors %}
+          <div class="text-danger mt-2">{{ form.patientPhoneNo.errors }}</div>
         {% endif %}
 
         <button type="submit" name="newReg" value="newReg" class="btn btn-success mt-2">Register Patient</button>

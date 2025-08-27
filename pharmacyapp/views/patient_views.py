@@ -47,7 +47,6 @@ def patient_dashboard(request):
             if form.is_valid():
                 patient = form.save(commit=False)
                 patient.patientID = f"AMC-{uuid4().hex[:8].upper()}"
-                patient.patientAadharNumber = patient.patientAadharNumber.upper()
                 patient.save()
 
                 queue_type = form.cleaned_data.get('queue_type')
@@ -119,8 +118,8 @@ def register_patient_from_search(request):
             messages.error(request, "Missing data for patient registration.")
             return redirect('patient_dashboard')
 
-        # Check if patient with this Aadhaar already exists
-        existing_patient = PatientDetail.objects.filter(patientAadharNumber=aadhar).first()
+        # Check if patient with this Phone Number already exists
+        existing_patient = PatientDetail.objects.filter(patientPhoneNo=phone).first()
         
         if existing_patient:
             # Check if already in any active queue
@@ -140,7 +139,6 @@ def register_patient_from_search(request):
         patient = PatientDetail.objects.create(
             patientName=name,
             patientPhoneNo=phone,
-            patientAadharNumber=aadhar,
             patientID=f"AMC-{uuid4().hex[:8].upper()}"
         )
 
