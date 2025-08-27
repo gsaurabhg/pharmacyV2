@@ -326,3 +326,40 @@ button.save.btn.btn-default:active {
         font-size: 6pt; /* Smaller font size for footnote */
     }
 }
+
+/* Modal Overrides (Bootstrap-like styling via custom classes) */
+.custom-modal-dialog {
+  max-width: 500px;
+  margin: 1.75rem auto;
+}
+
+.custom-modal-content {
+  background-color: #fff;
+  border-radius: 0.3rem;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+  padding: 1rem;
+}
+
+.custom-modal-header,
+.custom-modal-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.custom-modal-header {
+  border-bottom: none;
+}
+
+.custom-modal-body {
+  margin-top: 1rem;
+}
+
+.custom-close {
+  border: none;
+  background: none;
+  font-size: 1.5rem;
+  color: #333;
+  cursor: pointer;
+}

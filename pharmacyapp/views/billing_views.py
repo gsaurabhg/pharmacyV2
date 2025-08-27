@@ -180,3 +180,34 @@ def medicine_last_checkout(request, pk):
     return render(request, 'pharmacyapp/final_bill.html', {'billGeneration': final_bill_items})
 
 
+@login_required  
+def return_meds_redirect(request):
+    if request.method == "POST":
+        bill_no = request.POST.get("bill_no")
+        patient_id = request.POST.get("patient_id")
+
+        bill_entry = Bill.objects.filter(billNo=bill_no, patientID_id=patient_id).first()
+
+        if not bill_entry:
+            messages.error(request, "Bill number not found for this patient.")
+            return redirect("patient_dashboard")
+
+        return redirect("meds_return", pk=bill_entry.pk)
+
+    return redirect("patient_dashboard")
+
+@login_required  
+def meds_return_view(request, pk):
+    # Fetch all bill entries sharing the same billNo as the selected one
+    bill_entry = get_object_or_404(Bill, pk=pk)
+    bill_no = bill_entry.billNo
+
+    billDet = Bill.objects.filter(billNo=bill_no).select_related(
+        "medStock__medicine", "medStock__procurement", "patientID"
+    ).order_by("pk")
+
+    context = {
+        "billDet": billDet
+    }
+
+    return render(request, "pharmacyapp/meds_return.html", context)

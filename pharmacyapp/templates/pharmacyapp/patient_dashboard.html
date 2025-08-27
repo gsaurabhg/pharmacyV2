@@ -74,8 +74,35 @@
             <td>
                 <button type="submit" class="btn btn-primary btn-sm">Add to Queue</button>
               </form>
-              <a href="{% url 'bill_details' patient.pk %}" class="btn btn-success btn-sm mt-1 text-white">Generate Bill</a>
-              <a href="{% url 'medicine_last_checkout' patient.pk %}" class="btn btn-secondary btn-sm mt-1 text-white">Return</a>
+              <a href="{% url 'bill_details' patient.pk %}" class="btn btn-success btn-sm mt-1 text-white">Order Medicines</a>
+              <a href="{% url 'medicine_last_checkout' patient.pk %}" class="btn btn-secondary btn-sm mt-1 text-white">Last Bill</a>
+              <button type="button" class="btn btn-warning btn-sm mt-1 text-white"
+			          data-bs-toggle="modal"
+			          data-bs-target="#returnModal-{{ patient.pk }}">
+			    Return Medicines
+			  </button>
+				<div class="custom-modal modal fade" id="returnModal-{{ patient.pk }}" tabindex="-1" role="dialog" aria-labelledby="returnModalLabel-{{ patient.pk }}" aria-hidden="true">
+				  <div class="modal-dialog custom-modal-dialog" role="document">
+					<div class="modal-content custom-modal-content">
+					  <form method="POST" action="{% url 'return_meds_redirect' %}">
+						{% csrf_token %}
+						<div class="modal-header custom-modal-header">
+						  <h5 class="modal-title" id="returnModalLabel-{{ patient.pk }}">Enter Bill Number</h5>
+						  <button type="button" class="btn-close custom-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+						<div class="modal-body custom-modal-body">
+						  <input type="hidden" name="patient_id" value="{{ patient.pk }}">
+						  <label for="billNo-{{ patient.pk }}" class="form-label">Bill Number</label>
+						  <input type="text" name="bill_no" id="billNo-{{ patient.pk }}" class="form-control" required>
+						</div>
+						<div class="modal-footer custom-modal-footer">
+						  <button type="submit" class="btn btn-primary">Proceed</button>
+						  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+						</div>
+					  </form>
+					</div>
+				  </div>
+				</div>
             </td>
           </tr>
         {% endfor %}

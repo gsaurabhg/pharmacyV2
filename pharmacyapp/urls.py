@@ -36,6 +36,8 @@ urlpatterns = [
     path('patient/<int:pk>/checkout/', billing_views.medicine_checkout, name='medicine_checkout'),
     path('patient/<int:pk>/previouscheckout/', billing_views.medicine_last_checkout, name='medicine_last_checkout'),
     path('final-bill/<str:bill_no>/', billing_views.final_bill_view, name='final_bill_view'),
+    path("return-meds/", billing_views.return_meds_redirect, name="return_meds_redirect"),
+    path("meds-return/<int:pk>/", billing_views.meds_return_view, name="meds_return"),
 
     # Reports
     path('post/report/sales/', reports_views.report_sales, name='report_sales'),
@@ -54,6 +56,6 @@ urlpatterns = [
     path('swap-queue/<int:entry_id>/', patient_views.swap_patient_queue, name='swap_patient_queue'),
 
     # Optional legacy (if not using anymore, safe to remove)
-    # path('patient/details/', patient_views.patient_details, name='patient_details'),
+    #path('patient/details/', billing_views.patient_details, name='patient_details'),
     # path('queue/', patient_views.patient_queue, name='patient_queue'),  # Legacy
 ]
