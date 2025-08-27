@@ -174,7 +174,7 @@ def medicine_last_checkout(request, pk):
         latest_bill = Bill.objects.filter(patientID__patientID=patient.patientID, transactionCompleted='Y').latest('pk')
     except ObjectDoesNotExist:
         messages.info(request, "First-time customer. No previous invoice found.")
-        return redirect('patient_details')
+        return redirect('patient_dashboard')
 
     final_bill_items = Bill.objects.filter(billNo=latest_bill.billNo, transactionCompleted='Y')
     return render(request, 'pharmacyapp/final_bill.html', {'billGeneration': final_bill_items})
