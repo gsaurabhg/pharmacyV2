@@ -18,15 +18,12 @@ def patient_dashboard(request):
         form = PatientForm(request.POST, is_registering=is_registering)
         name = request.POST.get('patientName', '').strip()
         phone = request.POST.get('patientPhoneNo', '').strip()
-        aadhar = request.POST.get('patientAadharNumber', '').strip().upper()
 
         if 'search' in request.POST:
             query = Q()
             # Build query only if fields are provided
             if name:
                 query = Q(patientName__icontains=name)
-            elif aadhar:
-                query = Q(patientAadharNumber__iexact=aadhar)
             elif phone:
                 query = Q(patientPhoneNo=phone)
             else:
@@ -111,10 +108,9 @@ def register_patient_from_search(request):
     if request.method == 'POST':
         name = request.POST.get('name', '').strip()
         phone = request.POST.get('phone', '').strip()
-        aadhar = request.POST.get('aadhar', '').strip().upper()
         queue_type = request.POST.get('queue_type', 'current')
 
-        if not (name and phone and aadhar):
+        if not (name and phone):
             messages.error(request, "Missing data for patient registration.")
             return redirect('patient_dashboard')
 
